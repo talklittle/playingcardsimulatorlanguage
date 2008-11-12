@@ -1,6 +1,6 @@
 #!/bin/sh
 
-MICROC="./microc"
+PCGSL="./pcgsl"
 
 # Set time limit for all operations
 ulimit -t 30
@@ -61,7 +61,7 @@ Check() {
     echo "###### Testing $basename" 1>&2
 
     generatedfiles="${basename}.out" &&
-    Run "$MICROC" "<" $1 ">" ${basename}.out &&
+    Run "$PCGSL" "<" $1 ">" ${basename}.out &&
     Compare ${basename}.out ${reffile}.out ${basename}.out.diff
 
     # Report the status and clean up the generated files
