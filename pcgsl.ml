@@ -1,10 +1,11 @@
-let print = false
+let print = true
 
 let _ =
   let lexbuf = Lexing.from_channel stdin in
   let program = Parser.program Scanner.token lexbuf in
-  if print then
+  if print then 
     let listing = Printer.string_of_program program in  
-    print_string listing
-  else
-    ignore (Interpret.run program)
+    print_string listing 
+(*  else *)
+(*    ignore (Interpret.run program) *)
+      
