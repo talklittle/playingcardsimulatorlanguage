@@ -4,37 +4,45 @@ type op =
   Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | And | Or
 
 type scope =
-    None
-  | Global
+    Global
   | Local
-  | Some of string
+  | Entity
 
 type t =
-    Unknown
-  | Int
+    Int
   | StringType
   | Bool
-  | CardEntity
   | Card
+  | CardEntity
+  | List of t
 
-type var = Var of string * scope * t
-
-type expr =
-    Null
+type literal =
   | IntLiteral of int
   | StringLiteral of string
   | BoolLiteral of bool
-  | Id of var
+  | CardLiteral of string
+
+type vardec = VarDec of string * t
+
+type varexp = 
+    VarExp of string * scope
+  | GetIndex of varexp * expr
+and expr =
+    Null
+  | Variable of varexp
+  | Literal of literal
+  | ListLiteral of expr list
   | Binop of expr * op * expr
-  | Assign of expr * expr
-  | Transfer of expr * expr
-  | Call of var * expr list
+  | Rand of expr
+  | Assign of varexp * expr
+  | Transfer of varexp * expr
+  | Call of string * expr list
   | Noexpr
 
 type stmt =
     Break
   | Print of expr
-  | Read of expr
+  | Read of varexp
   | Expr of expr
   | Return of expr
   | If of expr * stmt list * stmt list
@@ -43,9 +51,9 @@ type stmt =
   | Nostmt
 
 type func_decl = {
-    fname : var;
-    formals : string list;
-    locals : var list;
+    fname : string;
+    formals : vardec list;
+    locals : vardec list;
     body : stmt list;
   }
 
@@ -58,21 +66,21 @@ type cent_decl = {
   }
 
 type glob_decl = {
-    globals : var list;
+    globals : vardec list;
   }
 
 type strt_decl = {
-    slocals : var list;
+    slocals : vardec list;
     sbody : stmt list;
   }
 
 type play_decl = {
-    plocals : var list;
+    plocals : vardec list;
     pbody : stmt list;
   }
 
 type wcon_decl = {
-    wlocals : var list;
+    wlocals : vardec list;
     wbody : stmt list;
   }
 
