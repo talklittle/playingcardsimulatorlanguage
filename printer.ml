@@ -1,5 +1,9 @@
 open Ast
 
+let rec tabs i = match i with
+    0 -> ""
+  | x -> "\t" ^ tabs (x - 1)
+
 let string_of_op op = match op with
     Add     -> "+" 
   | Sub     -> "-" 
@@ -18,65 +22,79 @@ let string_of_bool bool = match bool with
     True  -> "true"
   | False -> "false"
 
-let string_of_t t = match t with
-    Unknown    -> ""
-  | Int        -> "int "
-  | StringType -> "string "
-  | Bool       -> "bool "
-  | CardEntity -> "$"
-  | Card       -> "Card "
+let rec string_of_t t = match t with
+    Int        -> "int"
+  | StringType -> "string"
+  | Bool       -> "bool"
+  | Card       -> "Card"
+  | CardEntity -> "CardEntity"
+  | List(typ)  -> "list<" ^ string_of_t typ ^ ">"
 
 let string_of_scope scope = match scope with
-    None    -> ""
-  | Global  -> "#"
+    Global  -> "#"
   | Local   -> ""
-  | Some(s) -> "$" ^ s ^ "."
-			   
-let string_of_var v = match v with
-  Var(id, scope, t) -> string_of_t t ^ string_of_scope scope ^ id
+  | Entity   -> "$"
 
-let rec string_of_expr = function
+let string_of_lit lit = match lit with
+    IntLiteral(i)    -> string_of_int i
+  | StringLiteral(s) -> s
+  | BoolLiteral(b)   -> string_of_bool b
+  | CardLiteral(c)   -> c
+
+let string_of_vardec v = match v with
+    VarDec(id, t) -> string_of_t t ^ " " ^ id
+
+let rec string_of_varexp v = match v with
+  | VarExp(id, s) -> string_of_scope s ^ id
+  | GetIndex(v, e) -> string_of_varexp v ^ "[" ^ string_of_expr e ^ "]"
+and string_of_expr expr = match expr with
     Null -> "null"
-  | IntLiteral(l) -> string_of_int l
-  | StringLiteral(l) -> l
-  | BoolLiteral(b) -> string_of_bool b
-  | Id(v) -> string_of_var v
+  | Variable(v) -> string_of_varexp v
+  | Literal(l) -> string_of_lit l
+  | ListLiteral(el) -> 
+      "[" ^ String.concat ", " (List.map string_of_expr el) ^ "]"
   | Binop(e1, o, e2) ->
-      string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
-  | Assign(e1, e2) -> string_of_expr e1 ^ " <- " ^ string_of_expr e2
-  | Transfer(e1, e2) -> string_of_expr e1 ^ " -> " ^ string_of_expr e2
+      "(" ^ string_of_expr e1 ^ " " 
+      ^ string_of_op o ^ " " ^ string_of_expr e2 ^ ")"
+  | Rand(e) -> "~" ^ string_of_expr e
+  | Assign(v, e) -> string_of_varexp v ^ " = " ^ string_of_expr e
+  | Transfer(v, e) -> string_of_varexp v ^ " <- " ^ string_of_expr e
   | Call(f, el) ->
-      string_of_var f ^ "(" ^ 
-      String.concat ", " (List.map string_of_expr el) ^ ")"
+      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
 
-let rec string_of_stmt = function
+let rec string_of_stmt t stmt = tabs t ^ match stmt with
     Break -> "break;\n"
-  | Print(expr) -> string_of_expr expr ^ " >>\n"
-  | Read(expr) -> string_of_expr expr ^ " <<\n"
+  | Print(expr) -> "<< " ^ string_of_expr expr ^ ";\n"
+  | Read(var) -> ">> " ^ string_of_varexp var ^ ";\n"
   | Expr(expr) -> string_of_expr expr ^ ";\n"
   | Return(expr) -> "return " ^ string_of_expr expr ^ ";\n"
   | If(e, s1, s2) ->  "if (" ^ string_of_expr e ^ ") {\n" ^
-      String.concat "" (List.map string_of_stmt s1) ^ "} else {\n" ^ 
-      String.concat "" (List.map string_of_stmt s2) ^ "}\n"
+      String.concat "" (List.map (string_of_stmt (t+1)) s1) ^ 
+      tabs t ^ "} else {\n" ^ 
+      String.concat "" (List.map (string_of_stmt (t+1)) s2) ^ 
+      tabs t ^ "}\n"
   | For(e1, e2, e3, s) ->
-      "for (" ^ string_of_expr e1  ^ " ; " ^ string_of_expr e2 ^ " ; " ^
+      "for (" ^ string_of_expr e1  ^ "; " ^ string_of_expr e2 ^ "; " ^
       string_of_expr e3  ^ ") {\n" ^ 
-      String.concat "" (List.map string_of_stmt s) ^ "}\n"
+      String.concat "" (List.map (string_of_stmt (t+1)) s) ^ 
+      tabs t ^ "}\n"
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") {\n" ^ 
-      String.concat "" (List.map string_of_stmt s) ^ "}\n"
+      String.concat "" (List.map (string_of_stmt (t+1)) s) ^ 
+      tabs t ^ "}\n"
   | Nostmt -> ""
 
-let string_of_strdecl id = id ^ ";\n"
-				  
+let string_of_strdecl id = 
+  "\t" ^ id ^ ";\n"
+
 let string_of_vdecl v = 
-  string_of_var v ^ ";\n"
+  "\t" ^ string_of_vardec v ^ ";\n"
 
 let string_of_fdecl fdecl =
-  string_of_var fdecl.fname ^ "(" ^ 
-  String.concat ", " fdecl.formals ^ ")\n{\n" ^
+  fdecl.fname ^ "(" ^ 
+  String.concat ", " (List.map string_of_vardec fdecl.formals) ^ ")\n{\n" ^
   String.concat "" (List.map string_of_vdecl fdecl.locals) ^
-  String.concat "" (List.map string_of_stmt fdecl.body) ^
+  String.concat "" (List.map (string_of_stmt 1) fdecl.body) ^
   "}\n"
 
 let string_of_sdecl_1 sname strings =
@@ -92,7 +110,7 @@ let string_of_sdecl_2 sname vars =
 let string_of_sdecl_3 sname vars body =
   sname ^ "\n{\n" ^
   String.concat "" (List.map string_of_vdecl vars) ^
-  String.concat "" (List.map string_of_stmt body) ^
+  String.concat "" (List.map (string_of_stmt 1) body) ^
   "}\n"
 
 let string_of_program (spec, funcs) =

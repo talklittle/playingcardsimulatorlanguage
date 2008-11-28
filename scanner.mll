@@ -7,9 +7,14 @@ rule token = parse
 | ')'      { RPAREN }
 | '{'      { LBRACE }
 | '}'      { RBRACE }
+| '['      { LBRACK }
+| ']'      { RBRACK }
 | ';'      { SEMI }
 | ','      { COMMA }
+| "<-"     { TRANSFER }
+| "++"     { PLUSTWO }
 | '+'      { PLUS }
+| "--"     { MINUSTWO }
 | '-'      { MINUS }
 | '*'      { TIMES }
 | '/'      { DIVIDE }
@@ -17,9 +22,8 @@ rule token = parse
 | "-="     { MINUSEQ }
 | "*="     { TIMESEQ }
 | "/="     { DIVIDEEQ }
-| "<-"     { ASSIGN }
-| "->"     { TRANSFER }
 | "=="     { EQ }
+| '='      { ASSIGN }
 | "!="     { NEQ }
 | '<'      { LT }
 | "<="     { LEQ }
@@ -27,14 +31,15 @@ rule token = parse
 | ">="     { GEQ }
 | "&&"     { AND }
 | "||"     { OR }
-| "$"      { ENTITYVAR }
-| "#"      { GLOBALVAR }
-| "."      { ENTITYMEM }
-| ">>"     { PRINT }
-| "<<"     { READ }
+| '~'      { TILDE }
+| '#'      { GLOBALVAR }
+| '$'      { ENTITYVAR }
+| "<<"     { PRINT }
+| ">>"     { READ }
 | "bool"             { BOOL }
 | "break"            { BREAK }
 | "Card"             { CARD }
+| "CardEntity"       { CARDENTITY }
 | "CardEntities"     { CARDENTITIES }
 | "continue"         { CONTINUE }
 | "else"             { ELSE }
@@ -45,22 +50,24 @@ rule token = parse
 | "Include"          { INCLUDE }
 | "int"              { INT }
 | "list"             { LIST }
-| "me"               { ME }
 | "null"             { NULL }
-| "PlayOrder"        { PLAYORDER }
+| "Play"             { PLAY }
 | "return"           { RETURN }
 | "Start"            { START }
 | "string"           { STRING }
 | "true"             { TRUE }
-| "var"              { VAR }
 | "while"            { WHILE }
-| "WinningCondition" { WINNINGCONDITION }
+| "WinCondition" { WINCONDITION }
+| ['H' 'D' 'C' 'S']("J" | "Q" | "K" | "A" | "10" | ['2'-'9']) as
+    lxm { CARDLITERAL(lxm) }
 | ['0'-'9']+ as 
     lxm { INTLITERAL(int_of_string lxm) }
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as 
     lxm { ID(lxm) }
 | '\"'[^ '\n' '\t' '\b' '\r' '\\' '\'' '\"']*'\"' as 
     lxm { STRINGLITERAL(String.sub lxm 1 ((String.length lxm) - 1)) }
+| ['a'-'z' 'A'-'Z' '0'-'9' '_' '.']+ as
+    lxm { FILE(lxm) }
 | eof { EOF }
 | _ as 
     char { raise (Failure("illegal character " ^ Char.escaped char)) }
