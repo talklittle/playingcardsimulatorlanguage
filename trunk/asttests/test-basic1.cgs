@@ -1,0 +1,121 @@
+Include
+// Include library files according to some path environment variable.
+{
+	stdlib.cgl;
+}
+
+CardEntities 
+// Card Entities are addressed with '$'
+// All cards are initially located in the first Card Entity, in normal order.
+{
+	dealer;
+	player0;
+	player1;
+	flop;
+}
+
+Globals // Global variables are addressed with '#'
+{
+	int currentPot;
+	int lastBid;
+	list<int> chips;
+	list<CardEntity> players;
+	list<bool> doneBidding;
+	string message;
+}
+
+Start // Deal cards, set chips
+{
+	int i;
+	int j;
+	Card c;
+
+	//
+	// initialize global variables
+	//
+	#currentPot = 0;
+	#lastBid = 0;
+	#chips = [100, 100]; // start players off with 100 chips
+	#players = [$player0, $player1]; // have an array of players
+	#doneBidding = [false, false];
+	#message = "Please select a card.";
+	
+	// test card and randomness
+	c = H1;
+	c = C10;
+	c = SA;
+	c = D2;
+	i = ~1;
+	i = ~(5 + 4 / 3);
+
+	// shuffle the deck
+	shuffle($dealer);
+
+	// deal out 5 cards to each player
+	for (i = 0; i < 5; i++)	{
+	   for (j = 0; j < listLength(#players); j++) {
+	       #players[j] <- $dealer[0];
+	   }
+	}
+}
+
+Play 
+// Play functionality associated with a "round" of play
+{
+	int i;
+
+	for (i = 0; i < size(#players); i++) {
+	    play(#players[i]);
+	}
+
+	while (#doneBidding[0] && #doneBidding[1]) {
+	   play($player0);
+	   play($player1);
+	}
+
+	evaluateHandWinner();
+}
+
+WinCondition 
+// Condition for the game to end - evaluated after each round.
+// Must return a list of Card Entities (or null if no winner yet).
+{
+	if (#chips[0] <= 0 && #chips[1] <= 0) {
+	   return [];
+	} else {
+	   if (#chips[0] <= 0) {
+	      return [$player1];
+	   } else {
+	      return [$player0];
+	   }
+	}
+
+	return null;
+}
+
+play(CardEntity e) 
+// Play function
+{
+	int i;
+	int bid;
+
+	i = indexOf(#players, e);
+	#doneBidding[i] = false;
+	<< e; // print the cards of this card entity
+	
+	if (bid == null || bid < #lastBid) // haven't bet or overbet
+	{
+	   >> bid; // input a bet (auto convert input to type of 'bid')
+	   #chips[i] -= bid; // subtract bet from your current chips
+	   #currentPot += bid; // add bet to the current pot
+	   #lastBid = bid; // record the last bid to check overbets
+	}
+
+	#doneBidding[i] = true;
+}
+
+evaluateHandWinner(list<Card> lc, int round)
+{
+	//The best poker hand wins
+}	
+
