@@ -101,7 +101,7 @@ play(CardEntity e)
 
 	i = indexOf(#players, e);
 	#doneBidding[i] = false;
-	<< e; // print the cards of this card entity
+	<< "" ^ e; // print the cards of this card entity
 	
 	if (bid == null || bid < #lastBid) // haven't bet or overbet
 	{
