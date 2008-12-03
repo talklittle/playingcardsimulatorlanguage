@@ -17,6 +17,7 @@ let string_of_op op = match op with
   | Geq     -> ">="
   | And     -> "&&"
   | Or      -> "||"
+  | Concat  -> "^"
 
 let string_of_bool bool = match bool with
     True  -> "true"
@@ -37,7 +38,7 @@ let string_of_scope scope = match scope with
 
 let string_of_lit lit = match lit with
     IntLiteral(i)    -> string_of_int i
-  | StringLiteral(s) -> s
+  | StringLiteral(s) -> "\"" ^ s ^ "\""
   | BoolLiteral(b)   -> string_of_bool b
   | CardLiteral(c)   -> c
 

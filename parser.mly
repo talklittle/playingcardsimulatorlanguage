@@ -2,7 +2,7 @@
 
 %token SEMI LBRACK RBRACK LPAREN RPAREN LBRACE RBRACE COMMA
 %token PLUS PLUSEQ MINUS MINUSEQ TIMES TIMESEQ DIVIDE DIVIDEEQ PLUSTWO MINUSTWO
-%token TILDE TRANSFER ASSIGN EQ NEQ LT LEQ GT GEQ AND OR
+%token TILDE TRANSFER ASSIGN EQ NEQ LT LEQ GT GEQ AND OR CONCAT
 %token GLOBALVAR ENTITYVAR
 %token PRINT READ
 %token RETURN IF ELSE FOR WHILE BREAK CONTINUE 
@@ -18,6 +18,7 @@
 
 %nonassoc NOELSE
 %nonassoc ELSE
+%left CONCAT
 %left AND OR
 %right ASSIGN PLUSEQ MINUSEQ TIMESEQ DIVIDEEQ
 %right READ
@@ -150,6 +151,7 @@ expr:
   | expr GEQ      expr { Binop($1, Geq,   $3) }
   | expr AND      expr { Binop($1, And,   $3) }
   | expr OR       expr { Binop($1, Or,    $3) }
+  | expr CONCAT   expr { Binop($1, Concat,$3) }
   | var PLUSEQ    expr { Assign($1, Binop(Variable($1), Add, $3)) }
   | var MINUSEQ   expr { Assign($1, Binop(Variable($1), Sub, $3)) }
   | var TIMESEQ   expr { Assign($1, Binop(Variable($1), Mult, $3)) }

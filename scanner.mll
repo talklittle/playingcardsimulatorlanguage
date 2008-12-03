@@ -32,6 +32,7 @@ rule token = parse
 | "&&"     { AND }
 | "||"     { OR }
 | '~'      { TILDE }
+| '^'      { CONCAT }
 | '#'      { GLOBALVAR }
 | '$'      { ENTITYVAR }
 | "<<"     { PRINT }
@@ -65,7 +66,7 @@ rule token = parse
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as 
     lxm { ID(lxm) }
 | '\"'[^ '\n' '\t' '\b' '\r' '\\' '\'' '\"']*'\"' as 
-    lxm { STRINGLITERAL(String.sub lxm 1 ((String.length lxm) - 1)) }
+    lxm { STRINGLITERAL(String.sub lxm 1 ((String.length lxm) - 2)) }
 | ['a'-'z' 'A'-'Z' '0'-'9' '_' '.']+ as
     lxm { FILE(lxm) }
 | eof { EOF }
