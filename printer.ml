@@ -19,10 +19,6 @@ let string_of_op op = match op with
   | Or      -> "||"
   | Concat  -> "^"
 
-let string_of_bool bool = match bool with
-    True  -> "true"
-  | False -> "false"
-
 let rec string_of_t t = match t with
     Int        -> "int"
   | StringType -> "string"
@@ -36,12 +32,6 @@ let string_of_scope scope = match scope with
   | Local   -> ""
   | Entity   -> "$"
 
-let string_of_lit lit = match lit with
-    IntLiteral(i)    -> string_of_int i
-  | StringLiteral(s) -> "\"" ^ s ^ "\""
-  | BoolLiteral(b)   -> string_of_bool b
-  | CardLiteral(c)   -> c
-
 let string_of_vardec v = match v with
     VarDec(id, t) -> string_of_t t ^ " " ^ id
 
@@ -51,7 +41,10 @@ let rec string_of_varexp v = match v with
 and string_of_expr expr = match expr with
     Null -> "null"
   | Variable(v) -> string_of_varexp v
-  | Literal(l) -> string_of_lit l
+  | IntLiteral(i)    -> string_of_int (int_of_string i)
+  | StringLiteral(s) -> "\"" ^ s ^ "\""
+  | BoolLiteral(b)   -> b
+  | CardLiteral(c)   -> c
   | ListLiteral(el) -> 
       "[" ^ String.concat ", " (List.map string_of_expr el) ^ "]"
   | Binop(e1, o, e2) ->

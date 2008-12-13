@@ -132,11 +132,11 @@ expr_opt:
 
 expr:
     NULL             { Null }
-  | TRUE             { Literal(BoolLiteral(True)) }
-  | FALSE            { Literal(BoolLiteral(False)) }
-  | INTLITERAL       { Literal(IntLiteral($1)) }
-  | CARDLITERAL      { Literal(CardLiteral($1)) }
-  | STRINGLITERAL    { Literal(StringLiteral($1)) }
+  | TRUE             { BoolLiteral("True") }
+  | FALSE            { BoolLiteral("False") }
+  | INTLITERAL       { IntLiteral(string_of_int $1) }
+  | CARDLITERAL      { CardLiteral($1) }
+  | STRINGLITERAL    { StringLiteral($1) }
   | var              { Variable($1) }
   | TILDE expr       { Rand($2) }
   | expr PLUS     expr { Binop($1, Add,   $3) }
@@ -157,9 +157,9 @@ expr:
   | var TIMESEQ   expr { Assign($1, Binop(Variable($1), Mult, $3)) }
   | var DIVIDEEQ  expr { Assign($1, Binop(Variable($1), Div, $3)) }
   | var PLUSTWO        
-      { Assign($1, Binop(Variable($1), Add, Literal(IntLiteral(1)))) }
+      { Assign($1, Binop(Variable($1), Add, IntLiteral("1"))) }
   | var MINUSTWO       
-      { Assign($1, Binop(Variable($1), Sub, Literal(IntLiteral(1)))) }
+      { Assign($1, Binop(Variable($1), Sub, IntLiteral("1"))) }
   | var ASSIGN    expr { Assign($1, $3) }
   | var TRANSFER  expr { Transfer($1, $3) }
   | LBRACK list_opt RBRACK { ListLiteral($2) }

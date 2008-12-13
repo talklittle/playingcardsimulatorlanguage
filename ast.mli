@@ -1,6 +1,3 @@
-(* Simple boolean type, used for boolean literals *)
-type bool = True | False
-
 (* Simple binary operators *)
 type op = 
   Add | Sub | Mult | Div | Equal | Neq | Less | 
@@ -21,13 +18,6 @@ type t =
   | CardEntity (* "CardEntity" reference type *)
   | List of t (* "list" type, with "t" being the type of list elements *)
 
-(* Literals, which are found in expressions *) 
-type literal =
-  | IntLiteral of int (* An "int" literal *)
-  | StringLiteral of string (* A "string" literal *)
-  | BoolLiteral of bool (* A "bool" literal *)
-  | CardLiteral of string (* A "card" reference literal, e.g. H2, DQ, S10 *)
-
 (* Variable declaration, contains the id and the type of the variable *)
 type vardec = VarDec of string * t
 
@@ -42,7 +32,10 @@ type varexp =
 and expr =
     Null (* The null type, comes from the "null" keyword *)
   | Variable of varexp
-  | Literal of literal
+  | IntLiteral of string (* An "int" literal. Needs to be coerced to int in interpreter *)
+  | StringLiteral of string (* A "string" literal *)
+  | BoolLiteral of string (* A "bool" literal. Needs to be coerced to bool in interpreter *)
+  | CardLiteral of string (* A "card" reference literal, e.g. H2, DQ, S10 *)
   | ListLiteral of expr list (* The list literal, whose items can each be *)
                              (* expressions, so type checking needs to occur *)
                              (* in the interpreter. *)
