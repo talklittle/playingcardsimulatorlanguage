@@ -93,7 +93,7 @@ WinCondition
 	return null;
 }
 
-play(CardEntity e) 
+int play(CardEntity e) 
 // Play function
 {
 	int i;
@@ -112,10 +112,14 @@ play(CardEntity e)
 	}
 
 	#doneBidding[i] = true;
+
+	return 1;
 }
 
-evaluateHandWinner(list<Card> lc, int round)
+int evaluateHandWinner(list<Card> lc, int round)
 {
 	//The best poker hand wins
+
+	return 1;
 }	
 

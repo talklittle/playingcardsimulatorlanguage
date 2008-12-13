@@ -63,11 +63,24 @@ funcs_list:
   | funcs_list fdecl { $2 :: $1 }
 
 fdecl:
-    ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
-    { { fname = $1;
-	formals = $3;
-	locals = List.rev $6;
-	body = List.rev $7 } }
+    return_type ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
+    { { rtype = $1;
+        fname = $2;
+	formals = $4;
+	locals = List.rev $7;
+	body = List.rev $8 } }
+
+return_type:
+    INT { Int }
+  | STRING { StringType }
+  | BOOL { Bool }
+  | CARD { Card }
+  | CARDENTITY { CardEntity }
+  | LIST LT INT GT { List(Int) }
+  | LIST LT STRING GT { List(StringType) }
+  | LIST LT BOOL GT { List(Bool) }
+  | LIST LT CARD GT { List(Card) }
+  | LIST LT CARDENTITY GT { List(CardEntity) }
 
 formals_opt:
     /* nothing */ { [] }
