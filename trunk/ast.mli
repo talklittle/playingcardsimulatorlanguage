@@ -75,6 +75,7 @@ type stmt =
 
 (* Standard function declaration *)
 type func_decl = {
+    rtype : t;
     fname : string;
     formals : vardec list;
     locals : vardec list;
