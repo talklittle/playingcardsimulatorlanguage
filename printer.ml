@@ -41,7 +41,7 @@ let rec string_of_varexp v = match v with
 and string_of_expr expr = match expr with
     Null -> "null"
   | Variable(v) -> string_of_varexp v
-  | IntLiteral(i)    -> string_of_int (int_of_string i)
+  | IntLiteral(i)    -> i
   | StringLiteral(s) -> "\"" ^ s ^ "\""
   | BoolLiteral(b)   -> b
   | CardLiteral(c)   -> c
@@ -85,7 +85,7 @@ let string_of_vdecl v =
   "\t" ^ string_of_vardec v ^ ";\n"
 
 let string_of_fdecl fdecl =
-  fdecl.fname ^ "(" ^ 
+  string_of_t fdecl.rtype ^ " " ^ fdecl.fname ^ "(" ^ 
   String.concat ", " (List.map string_of_vardec fdecl.formals) ^ ")\n{\n" ^
   String.concat "" (List.map string_of_vdecl fdecl.locals) ^
   String.concat "" (List.map (string_of_stmt 1) fdecl.body) ^
