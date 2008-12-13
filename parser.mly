@@ -132,8 +132,8 @@ expr_opt:
 
 expr:
     NULL             { Null }
-  | TRUE             { BoolLiteral("True") }
-  | FALSE            { BoolLiteral("False") }
+  | TRUE             { BoolLiteral("true") }
+  | FALSE            { BoolLiteral("false") }
   | INTLITERAL       { IntLiteral(string_of_int $1) }
   | CARDLITERAL      { CardLiteral($1) }
   | STRINGLITERAL    { StringLiteral($1) }
