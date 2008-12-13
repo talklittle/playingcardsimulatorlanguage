@@ -22,14 +22,25 @@ let run (vars, funcs) =
   (* TODO put the rest of our expressions stuff here *)
   (* FIXME the types are really screwed up *)
   let rec eval env = function
-    (* IntLiteral, StringLiteral, BoolLiteral, CardLiteral *)
-    | Literal(i) -> i, env
+
+      Null -> 1, env  (* FIXME what to return for null? *)
     | Noexpr -> 1, env (* must be non-zero for the loop predicate *)
+
+    | Literal(i) -> i, env
+
+    (* Return (list of evaluated expressions), env *)
+    (* Applicative order: evaluate each argument, updating env each time *)
+    | ListLiteral(ls) ->
+        (match ls with
+          []       -> [], env
+        | hd :: tl ->
+          let evalhd, env = eval env hd in
+          let evaltl, env = eval env tl in
+          (evalhd :: evaltl), env)
 
     | Variable(var) ->
         (* XXX make sure this is correct. should locals and globals be separated?
                Do globals supersede locals for our language?? *)
-        
         let locals, globals = env in
         if NameMap.mem var locals then
           (NameMap.find var locals), env
@@ -41,29 +52,57 @@ let run (vars, funcs) =
         let v1, env = eval env e1 in
         let v2, env = eval env e2 in
         let boolean i = if i then 1 else 0 in
-        (match op with
-          Add -> v1 + v2
-        | Sub -> v1 - v2
-        | Mult -> v1 * v2
-        | Div -> v1 / v2
-        | Equal -> boolean (v1 = v2)
-        | Neq -> boolean (v1 != v2)
-        | Less -> boolean (v1 < v2)
-        | Leq -> boolean (v1 <= v2)
-        | Greater -> boolean (v1 > v2)
-        | Geq -> boolean (v1 >= v2)
-        | And -> boolean (v1 && v2)
-        | Or -> boolean (v1 || v2)
-        | Concat -> v1 ^ v2  (* XXX this is String concat, right? *)
+        (match v1, op, v2 with
+          IntLiteral, Add, IntLiteral -> v1 + v2
+        | IntLiteral, Sub, IntLiteral -> v1 - v2
+        | IntLiteral, Mult, IntLiteral -> v1 * v2
+        | IntLiteral, Div, IntLiteral -> v1 / v2
+        | IntLiteral, Equal, IntLiteral -> boolean (v1 = v2)
+        | StringLiteral, Equal, StringLiteral -> boolean (v1 = v2)
+        | CardLiteral, Equal, CardLiteral -> boolean (v1 = v2)
+        | BoolLiteral, Equal, BoolLiteral -> boolean (string_of_bool v1 = string_of_bool v2)
+        | IntLiteral, Neq, IntLiteral -> boolean (v1 <> v2)
+        | StringLiteral, Neq, StringLiteral -> boolean (v1 <> v2)
+        | CardLiteral, Neq, CardLiteral -> boolean (v1 <> v2)
+        | BoolLiteral, Neq, BoolLiteral -> boolean (string_of_bool v1 <> string_of_bool v2)
+        | IntLiteral, Less, IntLiteral -> boolean (v1 < v2)
+        | StringLiteral, Less, StringLiteral -> boolean (v1 < v2)
+        | CardLiteral, Less, CardLiteral -> boolean (v1 < v2)
+        | BoolLiteral, Less, BoolLiteral -> boolean (string_of_bool v1 < string_of_bool v2)
+        | IntLiteral, Leq, IntLiteral -> boolean (v1 <= v2)
+        | StringLiteral, Leq, StringLiteral -> boolean (v1 <= v2)
+        | CardLiteral, Leq, CardLiteral -> boolean (v1 <= v2)
+        | BoolLiteral, Leq, BoolLiteral -> boolean (string_of_bool v1 <= string_of_bool v2)
+        | IntLiteral, Greater, IntLiteral -> boolean (v1 > v2)
+        | StringLiteral, Greater, StringLiteral -> boolean (v1 > v2)
+        | CardLiteral, Greater, CardLiteral -> boolean (v1 > v2)
+        | BoolLiteral, Greater, BoolLiteral -> boolean (string_of_bool v1 > string_of_bool v2)
+        | IntLiteral, Geq, IntLiteral -> boolean (v1 >= v2)
+        | StringLiteral, Geq, StringLiteral -> boolean (v1 >= v2)
+        | CardLiteral, Geq, CardLiteral -> boolean (v1 >= v2)
+        | BoolLiteral, Geq, BoolLiteral -> boolean (string_of_bool v1 >= string_of_bool v2)
+        | BoolLiteral, And, BoolLiteral -> boolean (v1 && v2)
+        | BoolLiteral, Or, BoolLiteral -> boolean (v1 || v2)
+        | StringLiteral, Concat, StringLiteral -> v1 ^ v2  (* XXX we want String concat, right? *)
+        | _, _, _ ->
+            raise (Failure ("invalid binary operation"))
         ), env
+
+    | Rand(e) ->
+        1, env (* TODO *)
+
     | Assign(var, e) ->
-        (* FIXME our program separates locals and globals, right? *)
+        (* XXX our program separates locals and globals, right? *)
         let v, (locals, globals) = eval env e in
         if NameMap.mem var locals then
-          v, (NameMap.add var v locals , globals)
+          v, (NameMap.add var v locals, globals)
         else if NameMap.mem var globals then
           v, (locals, NameMap.var v globals)
         else raise (Failure ("undeclared identifier " ^ var))
+
+    | Transfer(var, e) ->
+        1, env (* TODO *)
+
     | Call("print", [e]) ->
         let v, env = eval env e in
         print_endline (string_of_int v);
