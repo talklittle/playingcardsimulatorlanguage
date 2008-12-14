@@ -23,27 +23,33 @@ let run (vars, funcs) =
   (* FIXME the types are really screwed up *)
   let rec eval env = function
 
-      Null -> "null", env  (* XXX ok to return "null" here? *)
-    | Noexpr -> "1", env (* must be non-zero for the loop predicate *)
+      Null -> Null, env  (* XXX ok to return "null" here? *)
+    | Noexpr -> Noexpr, env (* must be non-zero for the loop predicate *)
 
-    | IntLiteral(i) -> i, env
-    | StringLiteral(i) -> i, env
-    | BoolLiteral(i) -> i, env
-    | CardLiteral(i) -> i, env
+    | IntLiteral(i) -> IntLiteral(i), env
+    | StringLiteral(i) -> StringLiteral(i), env
+    | BoolLiteral(i) -> BoolLiteral(i), env
+    | CardLiteral(i) -> CardLiteral(i), env
 
     (* Return (list of evaluated expressions), env *)
     (* Applicative order: evaluate each argument, updating env each time *)
     | ListLiteral(ls) ->
         (match ls with
-          []       -> [], env
+          []       -> ListLiteral([]), env
         | hd :: tl ->
           let evalhd, env = eval env hd in
-          let evaltl, env = eval env tl in
-          (evalhd :: evaltl), env)
+          let evaltl, env = eval env (ListLiteral(tl)) in
+          (match evaltl with
+            ListLiteral(lstl) -> ListLiteral(evalhd :: lstl), env
+          | _ -> raise (Failure ("invalid ListLiteral construction"))))
 
     | Variable(var) ->
-        (* XXX make sure this is correct. should locals and globals be separated?
-               Do globals supersede locals for our language?? *)
+        (match var with
+          VarExp(id, scope) ->
+            (* TODO *)
+        | GetIndex(vexpr, idx) ->
+            (* TODO *)
+
         let locals, globals = env in
         if NameMap.mem var locals then
           (NameMap.find var locals), env
@@ -54,67 +60,66 @@ let run (vars, funcs) =
     | Binop(e1, op, e2) ->
         let v1, env = eval env e1 in
         let v2, env = eval env e2 in
-        let boolean i = if i then "1" else "0" in
+        let boolean i = if i then BoolLiteral(true) else BoolLiteral(false) in
         (match v1, op, v2 with
-          IntLiteral, Add, IntLiteral -> string_of_int(int_of_string v1 + int_of_string v2)
-        | IntLiteral, Sub, IntLiteral -> string_of_int(int_of_string v1 - int_of_string v2)
-        | IntLiteral, Mult, IntLiteral -> string_of_int(int_of_string v1 * int_of_string v2)
-        | IntLiteral, Div, IntLiteral -> string_of_int(int_of_string v1 / int_of_string v2)
+          IntLiteral(i1), Add, IntLiteral(i2)  -> IntLiteral(i1 + i2)
+        | IntLiteral(i1), Sub, IntLiteral(i2)  -> IntLiteral(i1 - i2)
+        | IntLiteral(i1), Mult, IntLiteral(i2) -> IntLiteral(i1 * i2)
+        | IntLiteral(i1), Div, IntLiteral(i2)  -> IntLiteral(i1 / i2)
+        | IntLiteral(i1),    Equal, IntLiteral(i2)    -> boolean (i1 = i2)
+        | StringLiteral(i1), Equal, StringLiteral(i2) -> boolean (i1 = i2)
+        | CardLiteral(i1),   Equal, CardLiteral(i2)   -> boolean (i1 = i2)
+        | BoolLiteral(i1),   Equal, BoolLiteral(i2)   -> boolean (string_of_bool i1 = string_of_bool i2)
+        | IntLiteral(i1),    Neq, IntLiteral(i2)    -> boolean (i1 <> i2)
+        | StringLiteral(i1), Neq, StringLiteral(i2) -> boolean (i1 <> i2)
+        | CardLiteral(i1),   Neq, CardLiteral(i2)   -> boolean (i1 <> i2)
+        | BoolLiteral(i1),   Neq, BoolLiteral(i2)   -> boolean (string_of_bool i1 <> string_of_bool i2)
+        | IntLiteral(i1),    Less, IntLiteral(i2)    -> boolean (i1 < i2)
+        | StringLiteral(i1), Less, StringLiteral(i2) -> boolean (i1 < i2)
+        | CardLiteral(i1),   Less, CardLiteral(i2)   -> boolean (i1 < i2) (* XXX cmp cards as string? *)
+        | IntLiteral(i1),    Leq, IntLiteral(i2)    -> boolean (i1 <= i2)
+        | StringLiteral(i1), Leq, StringLiteral(i2) -> boolean (i1 <= i2)
+        | CardLiteral(i1),   Leq, CardLiteral(i2)   -> boolean (i1 <= i2) (* XXX cmp cards as string? *)
+        | IntLiteral(i1),    Greater, IntLiteral(i2)    -> boolean (i1 > i2)
+        | StringLiteral(i1), Greater, StringLiteral(i2) -> boolean (i1 > i2)
+        | CardLiteral(i1),   Greater, CardLiteral(i2)   -> boolean (i1 > i2) (* XXX cmp cards as string? *)
+        | IntLiteral(i1),    Geq, IntLiteral(i2)    -> boolean (i1 >= i2)
+        | StringLiteral(i1), Geq, StringLiteral(i2) -> boolean (i1 >= i2)
+        | CardLiteral(i1),   Geq, CardLiteral(i2)   -> boolean (i1 >= i2) (* XXX cmp cards as string? *)
+        | BoolLiteral(i1), And, BoolLiteral(i2) -> boolean (i1 && i2)
+        | BoolLiteral(i1), Or, BoolLiteral(i2)  -> boolean (i1 || i2)
 
-        | IntLiteral, Equal, IntLiteral -> boolean (int_of_string v1 = int_of_string v2)
-        | StringLiteral, Equal, StringLiteral -> boolean (v1 = v2)
-        | CardLiteral, Equal, CardLiteral -> boolean (v1 = v2)
-        | BoolLiteral, Equal, BoolLiteral -> boolean (v1 = v2)
-        | IntLiteral, Neq, IntLiteral -> boolean (int_of_string v1 <> int_of_string v2)
-        | StringLiteral, Neq, StringLiteral -> boolean (v1 <> v2)
-        | CardLiteral, Neq, CardLiteral -> boolean (v1 <> v2)
-        | BoolLiteral, Neq, BoolLiteral -> boolean (v1 <> v2)
-
-        | IntLiteral, Less, IntLiteral -> boolean (int_of_string v1 < int_of_string v2)
-        | StringLiteral, Less, StringLiteral -> boolean (v1 < v2)
-        | CardLiteral, Less, CardLiteral -> boolean (v1 < v2) (* XXX ok compare cards as strings? *)
-        | BoolLiteral, Less, BoolLiteral -> boolean (v1 < v2)
-        | IntLiteral, Leq, IntLiteral -> boolean (int_of_string v1 <= int_of_string v2)
-        | StringLiteral, Leq, StringLiteral -> boolean (v1 <= v2)
-        | CardLiteral, Leq, CardLiteral -> boolean (v1 <= v2) (* XXX ok compare cards as strings? *)
-        | BoolLiteral, Leq, BoolLiteral -> boolean (v1 <= v2)
-        | IntLiteral, Greater, IntLiteral -> boolean (int_of_string v1 > int_of_string v2)
-        | StringLiteral, Greater, StringLiteral -> boolean (v1 > v2)
-        | CardLiteral, Greater, CardLiteral -> boolean (v1 > v2) (* XXX ok compare cards as strings? *)
-        | BoolLiteral, Greater, BoolLiteral -> boolean (v1 > v2)
-        | IntLiteral, Geq, IntLiteral -> boolean (int_of_string v1 >= int_of_string v2)
-        | StringLiteral, Geq, StringLiteral -> boolean (v1 >= v2)
-        | CardLiteral, Geq, CardLiteral -> boolean (v1 >= v2) (* XXX ok compare cards as strings? *)
-        | BoolLiteral, Geq, BoolLiteral -> boolean (v1 >= v2)
-
-        | BoolLiteral, And, BoolLiteral -> boolean (bool_of_string v1 && bool_of_string v2)
-        | BoolLiteral, Or, BoolLiteral -> boolean (bool_of_string v1 || bool_of_string v2)
-
-        | StringLiteral, Concat, StringLiteral -> v1 ^ v2  (* XXX we want String concat, right? *)
+        | StringLiteral(i1), Concat, StringLiteral(i2) -> StringLiteral(i1 ^ i2)  (* XXX we want String concat, right? *)
 
         | _, _, _ ->
             raise (Failure ("invalid binary operation"))
         ), env
 
     | Rand(e) ->
-        1, env (* TODO *)
+        IntLiteral(1), env (* TODO *)
 
     | Assign(var, e) ->
-        (* XXX our program separates locals and globals, right? *)
+        (* TODO *)
+        (*
         let v, (locals, globals) = eval env e in
         if NameMap.mem var locals then
           v, (NameMap.add var v locals, globals)
         else if NameMap.mem var globals then
           v, (locals, NameMap.var v globals)
         else raise (Failure ("undeclared identifier " ^ var))
+        *)
 
     | Transfer(var, e) ->
-        1, env (* TODO *)
+        IntLiteral(1), env (* TODO *)
 
+    (* FIXME can't assume everything is int
     | Call("print", [e]) ->
         let v, env = eval env e in
         print_endline (string_of_int v);
         0, env
+    *)
+
+    (* FIXME locals, globals, entities *)
     | Call(f, actuals) ->
         let fdecl =
           try NameMap.find f func_decls
@@ -133,57 +138,7 @@ let run (vars, funcs) =
   in
   (* end of eval section *)
 
-  (* Execute a statement and return an updated environment *)
-  (* TODO add the rest of our statements *)
-  let rec exec env = function
-      Block(stmts) -> List.fold_left exec env stmts
-    | Expr(e) -> let _, env = eval env e in env
-    | If(e, s1, s2) ->
-        let v, env = eval env e in
-        exec env (if v != 0 then s1 else s2)
-    | While (e, s) ->
-        let rec loop env =
-          let v, env = eval env e in
-          if v != 0 then loop (exec env s) else env
-        in loop env
-    | For(e1, e2, e3, s) ->
-        let _, env = eval env e1 in
-        let rec loop env =
-          let v, env = eval env e2 in
-          if v!= 0 then
-            let _, env = eval (exec env s) e3 in
-            loop env
-          else
-            env
-        in loop env
-    | Return(e) ->
-        let v, (locals, globals) = eval env e in
-        raise (ReturnException(v, globals))
-  in
-  (* end of statement execution *)
 
-  (* call: enter the function: bind actual values to formal args *)
-  (* XXX make sure globals are bound correctly when entering a function. probably this section *)
-  let locals =
-    try List.fold_left2
-      (fun locals formal actual -> NameMap.add formal actual locals)
-      NameMap.empty fdecl.formals actuals
-    with Invalid_argument(_) ->
-      raise (Failure ("wrong number of arguments to " ^ fdecl.fname))
-  in
-  let locals = List.fold_left   (* Set local variables to 0 *)
-      (fun locals local -> NameMap.add local 0 locals)
-      locals fdecl.locals
-  in   (* Execute each statement; return updated global symbol table *)
-  snd (List.fold_left exec (locals, globals) fdecl.body)
-
-(* run: set global variables to 0; find and run "start" *)
-(* TODO instead of setting global vars to 0, read them from the globals block *)
-in let globals = List.fold_left
-    (fun globals vdecl -> NameMap.add vdecl 0 globals)
-    NameMap.empty vars
-in try
-  call (NameMap.find "start" func_decls) [] globals
-with Not_found ->
-  raise (Failure ("did not find the start() function"))
-
+  1
+in
+1

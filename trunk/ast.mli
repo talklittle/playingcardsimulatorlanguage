@@ -32,9 +32,9 @@ type varexp =
 and expr =
     Null (* The null type, comes from the "null" keyword *)
   | Variable of varexp
-  | IntLiteral of string (* An "int" literal. Needs to be coerced to int in interpreter *)
+  | IntLiteral of int (* An "int" literal. Needs to be coerced to int in interpreter *)
   | StringLiteral of string (* A "string" literal *)
-  | BoolLiteral of string (* A "bool" literal. Needs to be coerced to bool in interpreter *)
+  | BoolLiteral of bool (* A "bool" literal. Needs to be coerced to bool in interpreter *)
   | CardLiteral of string (* A "card" reference literal, e.g. H2, DQ, S10 *)
   | ListLiteral of expr list (* The list literal, whose items can each be *)
                              (* expressions, so type checking needs to occur *)

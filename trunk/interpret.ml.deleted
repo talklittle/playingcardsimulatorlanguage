@@ -1,0 +1,56 @@
+
+  (* Execute a statement and return an updated environment *)
+  (* TODO add the rest of our statements *)
+  let rec exec env = function
+      Block(stmts) -> List.fold_left exec env stmts
+    | Expr(e) -> let _, env = eval env e in env
+    | If(e, s1, s2) ->
+        let v, env = eval env e in
+        exec env (if v != 0 then s1 else s2)
+    | While (e, s) ->
+        let rec loop env =
+          let v, env = eval env e in
+          if v != 0 then loop (exec env s) else env
+        in loop env
+    | For(e1, e2, e3, s) ->
+        let _, env = eval env e1 in
+        let rec loop env =
+          let v, env = eval env e2 in
+          if v!= 0 then
+            let _, env = eval (exec env s) e3 in
+            loop env
+          else
+            env
+        in loop env
+    | Return(e) ->
+        let v, (locals, globals) = eval env e in
+        raise (ReturnException(v, globals))
+  in
+  (* end of statement execution *)
+
+  (* call: enter the function: bind actual values to formal args *)
+  (* XXX make sure globals are bound correctly when entering a function. probably this section *)
+  let locals =
+    try List.fold_left2
+      (fun locals formal actual -> NameMap.add formal actual locals)
+      NameMap.empty fdecl.formals actuals
+    with Invalid_argument(_) ->
+      raise (Failure ("wrong number of arguments to " ^ fdecl.fname))
+  in
+  let locals = List.fold_left   (* Set local variables to 0 *)
+      (fun locals local -> NameMap.add local 0 locals)
+      locals fdecl.locals
+  in   (* Execute each statement; return updated global symbol table *)
+  snd (List.fold_left exec (locals, globals) fdecl.body)
+
+(* run: set global variables to 0; find and run "start" *)
+(* TODO instead of setting global vars to 0, read them from the globals block *)
+in let globals = List.fold_left
+    (fun globals vdecl -> NameMap.add vdecl 0 globals)
+    NameMap.empty vars
+in try
+  call (NameMap.find "start" func_decls) [] globals
+with Not_found ->
+  raise (Failure ("did not find the start() function"))
+
+
