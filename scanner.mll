@@ -44,7 +44,7 @@ rule token = parse
 | "CardEntities"     { CARDENTITIES }
 | "continue"         { CONTINUE }
 | "else"             { ELSE }
-| "false"            { FALSE }
+| "false"            { FALSE(false) }
 | "for"              { FOR }
 | "Globals"          { GLOBALS }
 | "if"               { IF }
@@ -56,7 +56,7 @@ rule token = parse
 | "return"           { RETURN }
 | "Start"            { START }
 | "string"           { STRING }
-| "true"             { TRUE }
+| "true"             { TRUE(true) }
 | "while"            { WHILE }
 | "WinCondition" { WINCONDITION }
 | ['H' 'D' 'C' 'S']("J" | "Q" | "K" | "A" | "10" | ['2'-'9']) as

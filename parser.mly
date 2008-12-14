@@ -8,7 +8,8 @@
 %token RETURN IF ELSE FOR WHILE BREAK CONTINUE 
 %token BOOL INT STRING CARD CARDENTITY LIST
 %token CARDENTITIES GLOBALS INCLUDE PLAY START WINCONDITION
-%token TRUE FALSE NULL
+%token NULL
+%token <bool> TRUE FALSE
 %token <int> INTLITERAL
 %token <string> STRINGLITERAL
 %token <string> CARDLITERAL
@@ -145,9 +146,9 @@ expr_opt:
 
 expr:
     NULL             { Null }
-  | TRUE             { BoolLiteral("true") }
-  | FALSE            { BoolLiteral("false") }
-  | INTLITERAL       { IntLiteral(string_of_int $1) }
+  | TRUE             { BoolLiteral(true) }
+  | FALSE            { BoolLiteral(false) }
+  | INTLITERAL       { IntLiteral($1) }
   | CARDLITERAL      { CardLiteral($1) }
   | STRINGLITERAL    { StringLiteral($1) }
   | var              { Variable($1) }
@@ -170,9 +171,9 @@ expr:
   | var TIMESEQ   expr { Assign($1, Binop(Variable($1), Mult, $3)) }
   | var DIVIDEEQ  expr { Assign($1, Binop(Variable($1), Div, $3)) }
   | var PLUSTWO        
-      { Assign($1, Binop(Variable($1), Add, IntLiteral("1"))) }
+      { Assign($1, Binop(Variable($1), Add, IntLiteral(1))) }
   | var MINUSTWO       
-      { Assign($1, Binop(Variable($1), Sub, IntLiteral("1"))) }
+      { Assign($1, Binop(Variable($1), Sub, IntLiteral(1))) }
   | var ASSIGN    expr { Assign($1, $3) }
   | var TRANSFER  expr { Transfer($1, $3) }
   | LBRACK list_opt RBRACK { ListLiteral($2) }

@@ -41,9 +41,9 @@ let rec string_of_varexp v = match v with
 and string_of_expr expr = match expr with
     Null -> "null"
   | Variable(v) -> string_of_varexp v
-  | IntLiteral(i)    -> i
+  | IntLiteral(i)    -> string_of_int i
   | StringLiteral(s) -> "\"" ^ s ^ "\""
-  | BoolLiteral(b)   -> b
+  | BoolLiteral(b)   -> string_of_bool b
   | CardLiteral(c)   -> c
   | ListLiteral(el) -> 
       "[" ^ String.concat ", " (List.map string_of_expr el) ^ "]"
