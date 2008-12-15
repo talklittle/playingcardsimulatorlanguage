@@ -42,8 +42,10 @@ and expr =
   | Binop of expr * op * expr
   | Rand of expr (* The random operator, e.g. ~1, ~(a + b). The interpreter *)
                  (* needs to check that its expression evaluates to "int" *)
-  | Assign of varexp * expr
-  | Transfer of varexp * expr (* The transfer operator, e.g $player1 <- H1. *)
+  | Assign of varexp * expr (* Assignment of an expression to a variable *)
+  | Append of expr * expr (* Appending to a list variable *)
+  | ListLength of expr (* Should evaluate to the length of a list *)
+  | Transfer of expr * expr (* The transfer operator, e.g $player1 <- H1. *)
                               (* The interpreter needs to check that the lhs *)
                               (* evaluates to CardEntity and rhs evaluates *)
                               (* to Card *)
