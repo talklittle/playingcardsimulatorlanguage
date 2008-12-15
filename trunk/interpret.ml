@@ -94,45 +94,34 @@ let run (vars, funcs) =
           VarExp(id, scope) ->
             (match scope with
               Local ->
+                (* NameMap maps var names to (value, type) *)
                 if NameMap.mem id locals then
-                  (NameMap.find id locals), env
+                  fst (NameMap.find id locals), env
                 else raise (Failure ("undeclared local variable " ^ id))
             | Global ->
                 if NameMap.mem id globals then
-                  (NameMap.find id globals), env
+                  fst (NameMap.find id globals), env
                 else raise (Failure ("undeclared global variable " ^ id))
             (* XXX are CardEntities retrieved this way? What expression do they evaluate to? *)
-            (*
             | Entity ->
                 if NameMap.mem id entities then
-                  (NameMap.find id entities), env
-                else raise (Failure ("undeclared CardEntity variable " ^ id))
+                  fst (NameMap.find id entities), env
+                else raise (Failure ("undeclared CardEntity " ^ id))
             )
-            *)
         | GetIndex(id, scope, index) ->
-            let evalidx, env = eval env idx in
+            let evalidx, env = eval env index in
             (match scope, evalidx with
               Local, IntLiteral(i) ->
                 if NameMap.mem id locals then
                   (match NameMap.find id locals with
-                    ListLiteral(ls), Int -> IntLiteral(List.nth ls i)
-                  | ListLiteral(ls), StringType -> StringLiteral(List.nth ls i)
-                  | ListLiteral(ls), Bool -> BoolLiteral(List.nth ls i)
-                  | ListLiteral(ls), Card -> CardLiteral(List.nth ls i)
-                  (* | ListLiteral(ls), CardEntity -> XXX what is CardEntity expression?? *)
-                  | ListLiteral(ls), List(t) -> ListLiteral(List.nth ls i)
+                    ListLiteral(ls), _ -> List.nth ls i
                   | _, _ -> raise (Failure ("trying to dereference a non-list"))
                   ), env
                 else raise (Failure ("undeclared local variable " ^ id))
             | Global, IntLiteral(i) ->
                 if NameMap.mem id globals then
                   (match NameMap.find id globals with
-                    ListLiteral(ls), Int -> IntLiteral(List.nth ls i)
-                  | ListLiteral(ls), StringType -> StringLiteral(List.nth ls i)
-                  | ListLiteral(ls), Bool -> BoolLiteral(List.nth ls i)
-                  | ListLiteral(ls), Card -> CardLiteral(List.nth ls i)
-                  (* | ListLiteral(ls), CardEntity -> XXX what is CardEntity expression?? *)
-                  | ListLiteral(ls), List(t) -> ListLiteral(List.nth ls i)
+                    ListLiteral(ls), _ -> List.nth ls i
                   | _, _ -> raise (Failure ("trying to dereference a non-list"))
                   ), env
                 else raise (Failure ("undeclared global variable " ^ id))
@@ -156,30 +145,92 @@ let run (vars, funcs) =
                   v, (locals, NameMap.add id (v, t) globals, entities)
                 else raise (Failure ("undeclared global variable " ^ id))
             (* XXX are entities assigned this way too? *)
-            (*
             | Entity ->
                 if NameMap.mem id entities then
                   let _, t = NameMap.find id locals in
-                  v, (locals, globals, NameMap.add id v entities)
+                  v, (locals, globals, NameMap.add id (v, t) entities)
                 else raise (Failure ("undeclared CardEntity " ^ id))
             )
+        | GetIndex(id, scope, index) ->
+            let evalidx, env = eval env index in
+            (match scope, evalidx with
+              Local, IntLiteral(i) ->
+                if NameMap.mem id locals then
+                  let rec inserthelper ls targetindex value curr =
+                    (match ls, curr with
+                      _ :: tl, targetindex  -> value :: tl
+                    | [], _                 -> raise (Failure ("index out of bounds"))
+                    | hd :: tl, _           -> hd :: (inserthelper tl targetindex value (curr+1)))
+                  in
+                  (match v, NameMap.find id locals with
+                    IntLiteral(_), (ListLiteral(ls), Int) ->
+                      v, (NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Int) locals, globals, entities)
+                  | StringLiteral(_), (ListLiteral(ls), StringType) ->
+                      v, (NameMap.add id ((ListLiteral(inserthelper ls i v 0)), StringType) locals, globals, entities)
+                  | BoolLiteral(_), (ListLiteral(ls), Bool) ->
+                      v, (NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Bool) locals, globals, entities)
+                  | CardLiteral(_), (ListLiteral(ls), Card) ->
+                      v, (NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Card) locals, globals, entities)
+                    (* FIXME what expression do CardEntities have?
+                  | CardEntityLiteral(_), (ListLiteral(ls), CardEntity) ->
+                      v, (NameMap.add id ((ListLiteral(inserthelper ls i v 0)), CardEntity) locals, globals, entities)
+                    *)
+                  | ListLiteral(_), (ListLiteral(ls), ListType(lt)) ->
+                      v, (NameMap.add id ((ListLiteral(inserthelper ls i v 0)), ListType(lt)) locals, globals, entities)
+                  | _, _ -> raise (Failure ("trying to dereference a non-list")))
+                else raise (Failure ("undeclared local variable " ^ id))
+            | Global, IntLiteral(i) ->
+                if NameMap.mem id globals then
+                  let rec inserthelper ls targetindex value curr =
+                    (match ls, curr with
+                      _ :: tl, targetindex  -> value :: tl
+                    | [], _                 -> raise (Failure ("index out of bounds"))
+                    | hd :: tl, _           -> hd :: (inserthelper tl targetindex value (curr+1)))
+                  in
+                  (match v, NameMap.find id globals with
+                    IntLiteral(_), (ListLiteral(ls), Int) ->
+                      v, (locals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Int) globals, entities)
+                  | StringLiteral(_), (ListLiteral(ls), StringType) ->
+                      v, (locals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), StringType) globals, entities)
+                  | BoolLiteral(_), (ListLiteral(ls), Bool) ->
+                      v, (locals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Bool) globals, entities)
+                  | CardLiteral(_), (ListLiteral(ls), Card) ->
+                      v, (locals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Card) globals, entities)
+                    (* FIXME what expression do CardEntities have?
+                  | CardEntityLiteral(_), (ListLiteral(ls), CardEntity) ->
+                      v, (locals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), CardEntity) globals, entities)
+                    *)
+                  | ListLiteral(_), (ListLiteral(ls), ListType(lt)) ->
+                      v, (locals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), ListType(lt)) globals, entities)
+                  | _, _ -> raise (Failure ("trying to dereference a non-list")))
+                else raise (Failure ("undeclared global variable " ^ id))
+            (* XXX Entities are treated the same way for assigning to a GetIndex?
+            | Entity, IntLiteral(i) ->
+                if NameMap.mem id entities then
+                  let rec inserthelper ls targetindex value curr =
+                    (match ls, curr with
+                      _ :: tl, targetindex  -> value :: tl
+                    | [], _                 -> raise (Failure ("index out of bounds"))
+                    | hd :: tl, _           -> hd :: (inserthelper tl targetindex value (curr+1))
+                  in
+                  (match v, NameMap.find id entities with
+                    IntLiteral(_), (ListLiteral(ls), Int) ->
+                      v, (locals, globals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Int) entities)
+                  | StringLiteral(_), (ListLiteral(ls), StringType) ->
+                      v, (locals, globals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), StringType) entities)
+                  | BoolLiteral(_), (ListLiteral(ls), Bool) ->
+                      v, (locals, globals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Bool) entities)
+                  | CardLiteral(_), (ListLiteral(ls), Card) ->
+                      v, (locals, globals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Card) entities)
+                    (* FIXME what expression do CardEntities have?
+                  | CardEntityLiteral(_), (ListLiteral(ls), CardEntity) ->
+                      v, (locals, globals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), CardEntity) entities)
+                    *)
+                  | ListLiteral(_), (ListLiteral(ls), Card) ->
+                      v, (locals, globals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), List) entities)
+                  | _, _ -> raise (Failure ("trying to dereference a non-list")))
+                else raise (Failure ("undeclared CardEntity " ^ id))
             *)
-        (* TODO still to fix after we changed GetIndex in AST *)
-        | GetIndex(vexp, idx) ->
-            let evalvexp, env = eval env (Variable(vexp)) in
-            let evalidx, env = eval env idx in
-            (match evalvexp, evalidx with
-              (* The key is the evaluated Variable expression *)
-              Variable(VarExp(id, Local)), IntLiteral(i) ->
-                let key = (Variable(GetIndex(VarExp(id, Local), evalidx))) in
-                if NameMap.mem key locals then
-                  (NameMap.find key locals), env
-                else raise (Failure ("local list dereference of " ^ id^"["^string_of_int i^"] without initializing that index"))
-            | Variable(VarExp(id, Global)), IntLiteral(i) ->
-                let key = (Variable(GetIndex(VarExp(id, Global), evalidx))) in
-                if NameMap.mem key globals then
-                  (NameMap.find key globals), env
-                else raise (Failure ("global list dereference of " ^ id^"["^string_of_int i^"] without initializing that index"))
             | _, _ ->
                 raise (Failure ("invalid list dereference, probably using non-integer index"))
             ))

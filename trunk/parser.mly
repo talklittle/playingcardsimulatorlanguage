@@ -77,11 +77,11 @@ return_type:
   | BOOL { Bool }
   | CARD { Card }
   | CARDENTITY { CardEntity }
-  | LIST LT INT GT { List(Int) }
-  | LIST LT STRING GT { List(StringType) }
-  | LIST LT BOOL GT { List(Bool) }
-  | LIST LT CARD GT { List(Card) }
-  | LIST LT CARDENTITY GT { List(CardEntity) }
+  | LIST LT INT GT { ListType(Int) }
+  | LIST LT STRING GT { ListType(StringType) }
+  | LIST LT BOOL GT { ListType(Bool) }
+  | LIST LT CARD GT { ListType(Card) }
+  | LIST LT CARDENTITY GT { ListType(CardEntity) }
 
 formals_opt:
     /* nothing */ { [] }
@@ -115,11 +115,11 @@ vdecl:
   | BOOL ID { VarDec($2, Bool) }
   | CARD ID { VarDec($2, Card) }
   | CARDENTITY ID { VarDec($2, CardEntity) }
-  | LIST LT INT GT ID { VarDec($5, List(Int)) }
-  | LIST LT STRING GT ID { VarDec($5, List(StringType)) }
-  | LIST LT BOOL GT ID { VarDec($5, List(Bool)) }
-  | LIST LT CARD GT ID { VarDec($5, List(Card)) }
-  | LIST LT CARDENTITY GT ID { VarDec($5, List(CardEntity)) }
+  | LIST LT INT GT ID { VarDec($5, ListType(Int)) }
+  | LIST LT STRING GT ID { VarDec($5, ListType(StringType)) }
+  | LIST LT BOOL GT ID { VarDec($5, ListType(Bool)) }
+  | LIST LT CARD GT ID { VarDec($5, ListType(Card)) }
+  | LIST LT CARDENTITY GT ID { VarDec($5, ListType(CardEntity)) }
 
 stmt_list:
     /* nothing */  { [] }
@@ -192,11 +192,11 @@ var:
 
 list_opt:
     /* nothing */ { [] }
-  | list  { List.rev $1 }
+  | list_  { List.rev $1 }
 
-list:
+list_:
     expr            { [$1] }
-  | list COMMA expr { $3 :: $1 }
+  | list_ COMMA expr { $3 :: $1 }
 
 actuals_opt:
     /* nothing */ { [] }

@@ -16,7 +16,7 @@ type t =
   | Bool (* "boolean" type *)
   | Card (* "Card" reference type *)
   | CardEntity (* "CardEntity" reference type *)
-  | List of t (* "list" type, with "t" being the type of list elements *)
+  | ListType of t (* "list" type, with "t" being the type of list elements *)
 
 (* Variable declaration, contains the id and the type of the variable *)
 type vardec = VarDec of string * t
