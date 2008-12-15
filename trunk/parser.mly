@@ -1,8 +1,8 @@
 %{ open Ast %}
 
-%token SEMI LBRACK RBRACK LPAREN RPAREN LBRACE RBRACE COMMA
+%token SEMI LBRACK RBRACK LPAREN RPAREN LBRACE RBRACE BAR COMMA
 %token PLUS PLUSEQ MINUS MINUSEQ TIMES TIMESEQ DIVIDE DIVIDEEQ PLUSTWO MINUSTWO
-%token TILDE TRANSFER ASSIGN EQ NEQ LT LEQ GT GEQ AND OR CONCAT
+%token TILDE TRANSFER ASSIGN EQ NEQ LT LEQ GT GEQ AND OR CONCAT APPEND
 %token GLOBALVAR ENTITYVAR
 %token PRINT READ
 %token RETURN IF ELSE FOR WHILE BREAK CONTINUE 
@@ -21,7 +21,7 @@
 %nonassoc ELSE
 %left CONCAT
 %left AND OR
-%right ASSIGN PLUSEQ MINUSEQ TIMESEQ DIVIDEEQ
+%right ASSIGN PLUSEQ MINUSEQ TIMESEQ DIVIDEEQ APPEND
 %right READ
 %right PRINT
 %left TRANSFER
@@ -175,7 +175,9 @@ expr:
   | var MINUSTWO       
       { Assign($1, Binop(Variable($1), Sub, IntLiteral(1))) }
   | var ASSIGN    expr { Assign($1, $3) }
-  | var TRANSFER  expr { Transfer($1, $3) }
+  | expr APPEND expr { Append($1, $3) }
+  | BAR expr BAR { ListLength($2) }
+  | expr TRANSFER  expr { Transfer($1, $3) }
   | LBRACK list_opt RBRACK { ListLiteral($2) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
@@ -186,6 +188,7 @@ var:
   | ENTITYVAR ID                     { VarExp($2, Entity) }
   | ID LBRACK expr RBRACK            { GetIndex($1, Local, $3) }
   | GLOBALVAR ID LBRACK expr RBRACK  { GetIndex($2, Global, $4) }
+  | ENTITYVAR ID LBRACK expr RBRACK  { GetIndex($2, Entity, $4) }
 
 list_opt:
     /* nothing */ { [] }

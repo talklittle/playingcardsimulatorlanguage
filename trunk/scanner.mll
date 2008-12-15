@@ -31,6 +31,8 @@ rule token = parse
 | ">="     { GEQ }
 | "&&"     { AND }
 | "||"     { OR }
+| "::"     { APPEND }
+| '|'      { BAR }
 | '~'      { TILDE }
 | '^'      { CONCAT }
 | '#'      { GLOBALVAR }
