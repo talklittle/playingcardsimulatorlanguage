@@ -22,11 +22,11 @@ type t =
 type vardec = VarDec of string * t
 
 (* Variable used in an expression, contains the id and scope of the variable *)
-(* Also can be a "GetIndex", which is a list dereference with "varexp" being *)
+(* Also can be a "GetIndex", which is a list dereference with string being *)
 (* the list variable, and expr being the expression within the brackets. *)
 type varexp = 
     VarExp of string * scope
-  | GetIndex of varexp * expr
+  | GetIndex of string * scope * expr
 
 (* The expression type *)
 and expr =

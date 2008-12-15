@@ -181,10 +181,11 @@ expr:
   | LPAREN expr RPAREN { $2 }
 
 var:
-    ID                        { VarExp($1, Local) }
-  | GLOBALVAR ID              { VarExp($2, Global) }
-  | ENTITYVAR ID              { VarExp($2, Entity) }
-  | var LBRACK expr RBRACK    { GetIndex($1, $3) }
+    ID                               { VarExp($1, Local) }
+  | GLOBALVAR ID                     { VarExp($2, Global) }
+  | ENTITYVAR ID                     { VarExp($2, Entity) }
+  | ID LBRACK expr RBRACK            { GetIndex($1, Local, $3) }
+  | GLOBALVAR ID LBRACK expr RBRACK  { GetIndex($2, Global, $4) }
 
 list_opt:
     /* nothing */ { [] }
