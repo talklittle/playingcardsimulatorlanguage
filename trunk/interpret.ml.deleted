@@ -1,3 +1,83 @@
+(**** the old definition of GetIndex   of varexp * expr ***)
+
+    | Variable(var) ->
+        let locals, globals, entities = env in
+        (match var with
+          VarExp(id, scope) ->
+            (match scope with
+              Local ->
+                if NameMap.mem origexp locals then
+                  (NameMap.find origexp locals), env
+                else raise (Failure ("undeclared local variable " ^ id))
+            | Global ->
+                if NameMap.mem origexp globals then
+                  (NameMap.find origexp globals), env
+                else raise (Failure ("undeclared global variable " ^ id))
+            | Entity ->
+                if NameMap.mem origexp entities then
+                  (NameMap.find origexp entities), env
+                else raise (Failure ("undeclared CardEntity variable " ^ id))
+            )
+        | GetIndex(vexp, idx) ->
+            let evalvexp, env = eval env (Variable(vexp)) in
+            let evalidx, env = eval env idx in
+            (match evalvexp, evalidx with
+              Variable(VarExp(id, Local)), IntLiteral(i) ->
+                let key = (Variable(GetIndex(VarExp(id, Local), evalidx))) in
+                if NameMap.mem key locals then
+                  (NameMap.find key locals), env
+                else raise (Failure ("local list dereference of " ^ id^"["^string_of_int i^"] without initializing that index"))
+            | Variable(VarExp(id, Global)), IntLiteral(i) ->
+                let key = (Variable(GetIndex(VarExp(id, Global), evalidx))) in
+                if NameMap.mem key globals then
+                  (NameMap.find key globals), env
+                else raise (Failure ("global list dereference of " ^ id^"["^string_of_int i^"] without initializing that index"))
+            | (* TODO the case where it's a GetIndex (multi-dimensional lists) *)
+            | _, _ ->
+                raise (Failure ("invalid list dereference, probably using non-integer index"))
+            ))
+
+    | Assign(var, e) ->
+        let v, (locals, globals, entities) = eval env e in
+        (match var with
+          VarExp(id, scope) ->
+            let varkey = (Variable(var)) in
+            (match scope with
+              Local ->
+                if NameMap.mem varkey locals then
+                  v, (NameMap.add varkey v locals, globals, entities)
+                else raise (Failure ("undeclared local variable " ^ id))
+            | Global ->
+                if NameMap.mem varkey globals then
+                  v, (locals, NameMap.add varkey v globals, entities)
+                else raise (Failure ("undeclared global variable " ^ id))
+            | Entity ->
+                (* XXX are entities assigned this way too? *)
+                if NameMap.mem varkey entities then
+                  v, (locals, globals, NameMap.add varkey v entities)
+                else raise (Failure ("undeclared CardEntity " ^ id))
+            )
+        | GetIndex(vexp, idx) ->
+            let evalvexp, env = eval env (Variable(vexp)) in
+            let evalidx, env = eval env idx in
+            (match evalvexp, evalidx with
+              (* The key is the evaluated Variable expression *)
+              Variable(VarExp(id, Local)), IntLiteral(i) ->
+                let key = (Variable(GetIndex(VarExp(id, Local), evalidx))) in
+                if NameMap.mem key locals then
+                  (NameMap.find key locals), env
+                else raise (Failure ("local list dereference of " ^ id^"["^string_of_int i^"] without initializing that index"))
+            | Variable(VarExp(id, Global)), IntLiteral(i) ->
+                let key = (Variable(GetIndex(VarExp(id, Global), evalidx))) in
+                if NameMap.mem key globals then
+                  (NameMap.find key globals), env
+                else raise (Failure ("global list dereference of " ^ id^"["^string_of_int i^"] without initializing that index"))
+            | (* TODO the case where it's a GetIndex (multi-dimensional lists) *)
+            | _, _ ->
+                raise (Failure ("invalid list dereference, probably using non-integer index"))
+            ))
+(*******)
+
 
   (* Execute a statement and return an updated environment *)
   (* TODO add the rest of our statements *)

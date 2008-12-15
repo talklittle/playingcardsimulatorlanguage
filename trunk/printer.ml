@@ -37,7 +37,7 @@ let string_of_vardec v = match v with
 
 let rec string_of_varexp v = match v with
   | VarExp(id, s) -> string_of_scope s ^ id
-  | GetIndex(v, e) -> string_of_varexp v ^ "[" ^ string_of_expr e ^ "]"
+  | GetIndex(id, s, e) -> string_of_scope s ^ id ^ "[" ^ string_of_expr e ^ "]"
 and string_of_expr expr = match expr with
     Null -> "null"
   | Variable(v) -> string_of_varexp v
