@@ -52,7 +52,9 @@ and string_of_expr expr = match expr with
       ^ string_of_op o ^ " " ^ string_of_expr e2 ^ ")"
   | Rand(e) -> "~" ^ string_of_expr e
   | Assign(v, e) -> string_of_varexp v ^ " = " ^ string_of_expr e
-  | Transfer(v, e) -> string_of_varexp v ^ " <- " ^ string_of_expr e
+  | ListLength(e) -> "|" ^ string_of_expr e ^ "|"
+  | Append(e1, e2) -> string_of_expr e1 ^ "::" ^ string_of_expr e2
+  | Transfer(e1, e2) -> string_of_expr e1 ^ " <- " ^ string_of_expr e2
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
