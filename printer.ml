@@ -25,7 +25,7 @@ let rec string_of_t t = match t with
   | Bool       -> "bool"
   | Card       -> "Card"
   | CardEntity -> "CardEntity"
-  | List(typ)  -> "list<" ^ string_of_t typ ^ ">"
+  | ListType(typ)  -> "list<" ^ string_of_t typ ^ ">"
 
 let string_of_scope scope = match scope with
     Global  -> "#"
