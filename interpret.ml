@@ -235,6 +235,15 @@ let run (vars, funcs) =
                 raise (Failure ("invalid list dereference, probably using non-integer index"))
             ))
 
+    | ListLength(vlist) ->
+        let evlist, env = eval env vlist in
+        (match evlist with
+          ListLiteral(ls) -> IntLiteral(List.length ls), env
+        | _ -> raise (Failure ("argument to list length operator must be a list")))
+
+    | Append(vlist, e) ->
+        IntLiteral(1), env (* TODO *)
+
     | Transfer(var, e) ->
         IntLiteral(1), env (* TODO *)
 
