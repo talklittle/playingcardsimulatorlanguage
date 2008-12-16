@@ -16,7 +16,7 @@ type t =
   | Bool (* "boolean" type *)
   | Card (* "Card" reference type *)
   | CardEntity (* "CardEntity" reference type *)
-  | ListType of t (* "list" type, with "t" being the type of list elements *)
+  | ListType (* "list" type. elements of a list can be expressions. *)
 
 (* Variable declaration, contains the id and the type of the variable *)
 type vardec = VarDec of string * t
@@ -114,7 +114,7 @@ type play_decl = {
   }
 
 (* WinCondition declaration. Executed before each Play execution. Has a *)
-(* return type of List<CardEntity> *)
+(* return type of List (containing CardEntities) *)
 type wcon_decl = {
     wlocals : vardec list;
     wbody : stmt list;

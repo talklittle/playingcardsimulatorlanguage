@@ -94,18 +94,18 @@ let run (vars, funcs) =
           VarExp(id, scope) ->
             (match scope with
               Local ->
-                (* NameMap maps var names to (value, type) *)
+                (* NameMap maps var names to (literalvalue) *)
                 if NameMap.mem id locals then
-                  fst (NameMap.find id locals), env
+                  NameMap.find id locals, env
                 else raise (Failure ("undeclared local variable " ^ id))
             | Global ->
                 if NameMap.mem id globals then
-                  fst (NameMap.find id globals), env
+                  NameMap.find id globals, env
                 else raise (Failure ("undeclared global variable " ^ id))
             (* XXX are CardEntities retrieved this way? What expression do they evaluate to? *)
             | Entity ->
                 if NameMap.mem id entities then
-                  fst (NameMap.find id entities), env
+                  NameMap.find id entities, env
                 else raise (Failure ("undeclared CardEntity " ^ id))
             )
         | GetIndex(id, scope, index) ->
@@ -114,15 +114,15 @@ let run (vars, funcs) =
               Local, IntLiteral(i) ->
                 if NameMap.mem id locals then
                   (match NameMap.find id locals with
-                    ListLiteral(ls), _ -> List.nth ls i
-                  | _, _ -> raise (Failure ("trying to dereference a non-list"))
+                    ListLiteral(ls) -> List.nth ls i
+                  | _ -> raise (Failure ("trying to dereference a non-list"))
                   ), env
                 else raise (Failure ("undeclared local variable " ^ id))
             | Global, IntLiteral(i) ->
                 if NameMap.mem id globals then
                   (match NameMap.find id globals with
-                    ListLiteral(ls), _ -> List.nth ls i
-                  | _, _ -> raise (Failure ("trying to dereference a non-list"))
+                    ListLiteral(ls) -> List.nth ls i
+                  | _ -> raise (Failure ("trying to dereference a non-list"))
                   ), env
                 else raise (Failure ("undeclared global variable " ^ id))
             | _, _ ->
@@ -136,19 +136,16 @@ let run (vars, funcs) =
             (match scope with
               Local ->
                 if NameMap.mem id locals then
-                  let _, t = NameMap.find id locals in
-                  v, (NameMap.add id (v, t) locals, globals, entities)
+                  v, (NameMap.add id v locals, globals, entities)
                 else raise (Failure ("undeclared local variable " ^ id))
             | Global ->
                 if NameMap.mem id globals then
-                  let _, t = NameMap.find id globals in
-                  v, (locals, NameMap.add id (v, t) globals, entities)
+                  v, (locals, NameMap.add id v globals, entities)
                 else raise (Failure ("undeclared global variable " ^ id))
             (* XXX are entities assigned this way too? *)
             | Entity ->
                 if NameMap.mem id entities then
-                  let _, t = NameMap.find id locals in
-                  v, (locals, globals, NameMap.add id (v, t) entities)
+                  v, (locals, globals, NameMap.add id v entities)
                 else raise (Failure ("undeclared CardEntity " ^ id))
             )
         | GetIndex(id, scope, index) ->
@@ -162,22 +159,10 @@ let run (vars, funcs) =
                     | [], _                 -> raise (Failure ("index out of bounds"))
                     | hd :: tl, _           -> hd :: (inserthelper tl targetindex value (curr+1)))
                   in
-                  (match v, NameMap.find id locals with
-                    IntLiteral(_), (ListLiteral(ls), Int) ->
-                      v, (NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Int) locals, globals, entities)
-                  | StringLiteral(_), (ListLiteral(ls), StringType) ->
-                      v, (NameMap.add id ((ListLiteral(inserthelper ls i v 0)), StringType) locals, globals, entities)
-                  | BoolLiteral(_), (ListLiteral(ls), Bool) ->
-                      v, (NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Bool) locals, globals, entities)
-                  | CardLiteral(_), (ListLiteral(ls), Card) ->
-                      v, (NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Card) locals, globals, entities)
-                    (* FIXME what expression do CardEntities have?
-                  | CardEntityLiteral(_), (ListLiteral(ls), CardEntity) ->
-                      v, (NameMap.add id ((ListLiteral(inserthelper ls i v 0)), CardEntity) locals, globals, entities)
-                    *)
-                  | ListLiteral(_), (ListLiteral(ls), ListType(lt)) ->
-                      v, (NameMap.add id ((ListLiteral(inserthelper ls i v 0)), ListType(lt)) locals, globals, entities)
-                  | _, _ -> raise (Failure ("trying to dereference a non-list")))
+                  (match NameMap.find id locals with
+                    ListLiteral(ls) ->
+                      v, (NameMap.add id (ListLiteral(inserthelper ls i v 0)) locals, globals, entities)
+                  | _ -> raise (Failure ("trying to dereference a non-list")))
                 else raise (Failure ("undeclared local variable " ^ id))
             | Global, IntLiteral(i) ->
                 if NameMap.mem id globals then
@@ -187,22 +172,10 @@ let run (vars, funcs) =
                     | [], _                 -> raise (Failure ("index out of bounds"))
                     | hd :: tl, _           -> hd :: (inserthelper tl targetindex value (curr+1)))
                   in
-                  (match v, NameMap.find id globals with
-                    IntLiteral(_), (ListLiteral(ls), Int) ->
-                      v, (locals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Int) globals, entities)
-                  | StringLiteral(_), (ListLiteral(ls), StringType) ->
-                      v, (locals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), StringType) globals, entities)
-                  | BoolLiteral(_), (ListLiteral(ls), Bool) ->
-                      v, (locals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Bool) globals, entities)
-                  | CardLiteral(_), (ListLiteral(ls), Card) ->
-                      v, (locals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Card) globals, entities)
-                    (* FIXME what expression do CardEntities have?
-                  | CardEntityLiteral(_), (ListLiteral(ls), CardEntity) ->
-                      v, (locals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), CardEntity) globals, entities)
-                    *)
-                  | ListLiteral(_), (ListLiteral(ls), ListType(lt)) ->
-                      v, (locals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), ListType(lt)) globals, entities)
-                  | _, _ -> raise (Failure ("trying to dereference a non-list")))
+                  (match NameMap.find id globals with
+                    ListLiteral(ls) ->
+                      v, (locals, NameMap.add id (ListLiteral(inserthelper ls i v 0)) globals, entities)
+                  | _ -> raise (Failure ("trying to dereference a non-list")))
                 else raise (Failure ("undeclared global variable " ^ id))
             (* XXX Entities are treated the same way for assigning to a GetIndex?
             | Entity, IntLiteral(i) ->
@@ -242,10 +215,19 @@ let run (vars, funcs) =
         | _ -> raise (Failure ("argument to list length operator must be a list")))
 
     | Append(vlist, e) ->
-        IntLiteral(1), env (* TODO *)
+        let v, env = eval env e in
+        let evlist, env = eval env vlist in
+        (match evlist with
+          ListLiteral(ls) -> ListLiteral(ls @ [v]), env
+        | _ -> raise (Failure ("trying to append an element to a non-list")))
 
-    | Transfer(var, e) ->
-        IntLiteral(1), env (* TODO *)
+    | Transfer(cevar, card) ->
+        (* Make sure that cevar is a CardEntity, and e is Card *)
+        let evalc, env = eval env card in
+        let evalce, env = eval env cevar in
+        (match evalce, evalc with
+          (*CardEntity(ce), Card(c) -> XXX CardEntity expression??? *)
+        | _, _ -> raise (Failure ("Transfer: arguments must be cardentity <- card")))
 
     (* FIXME can't assume everything is int
     | Call("print", [e]) ->
@@ -265,11 +247,11 @@ let run (vars, funcs) =
               let v, env = eval env actual in
               v :: actuals, values) ([], env) actuals
         in
-        let (locals, globals) = env in
+        let (locals, globals, entities) = env in
         try
           let globals = call fdecl actuals globals
-          in  0, (locals, globals)
-        with ReturnException(v, globals) -> v, (locals, globals)
+          in  BoolLiteral(false), (locals, globals, entities)
+        with ReturnException(v, globals) -> v, (locals, globals, entities)
   in
   (* end of eval section *)
 
