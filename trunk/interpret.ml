@@ -5,7 +5,7 @@ module NameMap = Map.Make(struct
   let compare x y = Pervasives.compare x y
 end)
 
-exception ReturnException of Ast.expr * Ast.expr NameMap.t
+exception ReturnException of Ast.expr * Ast.expr NameMap.t * Ast.expr NameMap.t * Ast.expr NameMap.t
 
 (* seed random number generator with current time *)
 let _ = Random.init (truncate (Unix.time ()))
@@ -87,6 +87,19 @@ let run (vars, funcs) =
           IntLiteral(i) -> IntLiteral(Random.int i), env
         | _ -> raise (Failure ("invalid argument for random operator ~. Must supply an int."))
         )
+
+    | GetType(e) ->
+        let v, env = eval env e in
+        (match v with
+          Null -> StringLiteral("null")
+        | IntLiteral(_) -> StringLiteral("int")
+        | StringLiteral(_) -> StringLiteral("string")
+        | BoolLiteral(_) -> StringLiteral("bool")
+        | CardLiteral(_) -> StringLiteral("Card")
+        | ListLiteral(_) -> StringLiteral("list")
+        | Variable(VarExp(_, Entity)) -> StringLiteral("CardEntity")
+        | _ -> raise (Failure ("internal error: unrecognized type in GetType"))
+        ), env
 
     | Variable(var) ->
         let locals, globals, entities, cards = env in
@@ -229,31 +242,34 @@ let run (vars, funcs) =
                 | value :: tl  -> tl
                 | hd :: tl      -> hd :: (deletehelper tl value))
               in
-              let oldowner = NameMap.find c cards in
-              let entities =
-              (if NameMap.mem oldowner entities then
-                let oldownercards = NameMap.find oldowner entities in
-                  (match oldownercards with
-                    ListLiteral(c1) -> NameMap.add oldowner (ListLiteral(deletehelper c1 evalc)) entities
-                  | _ -> raise (Failure ("internal error: CardEntity "^id^" not storing ListLiteral")))
-              else raise (Failure ("internal error: Card "^c^" invalid owner "^oldowner))
-              ) in
-              (* add mapping from Card name to StringLiteral containing CardEntity's name *)
-              let cards = NameMap.add c (StringLiteral(id)) cards in
-              let rec insertunique ls value =
-                (match ls with
-                  []           -> [value]
-                | value :: tl  -> ls
-                | hd :: tl     -> hd :: (insertunique tl value))
-              in
-              (* add updated ListLiteral to new entity's list *)
-              if NameMap.mem id entities then
-                let entitycards = NameMap.find id entities in
-                (match entitycards with
-                  ListLiteral(c2) ->
-                    StringLiteral(id), (locals, globals, NameMap.add id (ListLiteral(insertunique c2 evalc)) entities, cards)
-                | _ -> raise (Failure ("internal error: CardEntity "^id^" not storing ListLiteral")))
-              else raise (Failure ("Invalid CardEntity: " ^ id))
+              let oldownerlit = NameMap.find c cards in
+              (match oldownerlit with
+                StringLiteral(oldowner) ->
+                  let entities =
+                  (if NameMap.mem oldowner entities then
+                    let oldownercards = NameMap.find oldowner entities in
+                      (match oldownercards with
+                        ListLiteral(c1) -> NameMap.add oldowner (ListLiteral(deletehelper c1 evalc)) entities
+                      | _ -> raise (Failure ("internal error: CardEntity "^id^" not storing ListLiteral")))
+                  else raise (Failure ("internal error: Card "^c^" invalid owner "^oldowner))
+                  ) in
+                  (* add mapping from Card name to StringLiteral containing CardEntity's name *)
+                  let cards = NameMap.add c (StringLiteral(id)) cards in
+                  let rec insertunique ls value =
+                    (match ls with
+                      []           -> [value]
+                    | value :: tl  -> ls
+                    | hd :: tl     -> hd :: (insertunique tl value))
+                  in
+                  (* add updated ListLiteral to new entity's list *)
+                  if NameMap.mem id entities then
+                    let entitycards = NameMap.find id entities in
+                    (match entitycards with
+                      ListLiteral(c2) ->
+                        StringLiteral(id), (locals, globals, NameMap.add id (ListLiteral(insertunique c2 evalc)) entities, cards)
+                    | _ -> raise (Failure ("internal error: CardEntity "^id^" not storing ListLiteral")))
+                  else raise (Failure ("Invalid CardEntity: " ^ id))
+              | _ -> raise (Failure ("internal error: Card "^id^" not mapped to a StringLiteral")))
 
             else raise (Failure ("Invalid card name: " ^ c))
         | _, _ -> raise (Failure ("Transfer: arguments must be cardentity <- card")))
@@ -277,9 +293,9 @@ let run (vars, funcs) =
         in
         let (locals, globals, entities, cards) = env in
         try
-          let globals = call fdecl actuals globals entities, cards
+          let globals = call fdecl actuals globals entities cards
           in  BoolLiteral(false), (locals, globals, entities, cards)
-        with ReturnException(v, globals) -> v, (locals, globals, entities, cards)
+        with ReturnException(v, globals, entities, cards) -> v, (locals, globals, entities, cards)
   in
   (* Execute a statement and return an updated environment *)
   (* TODO add the rest of our statements *)
@@ -308,7 +324,8 @@ let run (vars, funcs) =
         in loop env
     | Return(e) ->
         let v, (locals, globals, entities, cards) = eval env e in
-        raise (ReturnException(v, (globals, entities, cards)))
+        raise (ReturnException(v, globals, entities, cards))
+    | _ -> raise (Failure ("internal error: unknown stmt type encountered"))
   in
   (* end of statement execution *)
 

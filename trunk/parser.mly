@@ -122,7 +122,7 @@ stmt:
   | PRINT expr SEMI { Print($2) }
   | READ var SEMI { Read($2) }
   | BREAK SEMI { Break }
-  | RETURN expr SEMI { Return($2) }
+  | RETURN expr_opt SEMI { Return($2) }
   | IF LPAREN expr RPAREN LBRACE stmt_list RBRACE /* %prec NOELSE */
       { If($3, $6, []) }
   | IF LPAREN expr RPAREN LBRACE stmt_list RBRACE ELSE LBRACE stmt_list RBRACE
@@ -132,9 +132,9 @@ stmt:
 /*      { For($3, $5, $7, $10) } */
   | WHILE LPAREN expr RPAREN LBRACE stmt_list RBRACE { While($3, $6) }
 
-/*expr_opt: */
-    /* nothing */ /*{ Noexpr }*/
-/*  | expr          { $1 }*/
+expr_opt:
+    /* nothing */ { Noexpr }
+  | expr          { $1 }
 
 expr:
     NULL             { Null }
