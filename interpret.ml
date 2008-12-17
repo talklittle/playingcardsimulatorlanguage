@@ -104,7 +104,8 @@ let run (vars, funcs) =
                 else raise (Failure ("undeclared global variable " ^ id))
             | Entity ->
                 if NameMap.mem id entities then
-                  NameMap.find id entities, env
+                  (* return the entity variable *)
+                  Variable(var), env
                 else raise (Failure ("undeclared CardEntity " ^ id))
             )
         | GetIndex(id, scope, index) ->
@@ -114,16 +115,35 @@ let run (vars, funcs) =
                 if NameMap.mem id locals then
                   (match NameMap.find id locals with
                     ListLiteral(ls) -> List.nth ls i
-                  | _ -> raise (Failure ("trying to dereference a non-list"))
+                  | Variable(VarExp(origid, Entity)) ->
+                      if NameMap.mem origid entities then
+                        (match NameMap.find origid entities with
+                          ListLiteral(ls) -> List.nth ls i
+                        | _ -> raise (Failure ("internal error: CardEntity "^origid^" not storing ListLiteral")))
+                      else raise (Failure ("internal error: "^id^" holding invalid reference to CardEntity "^origid))
+                  | _ -> raise (Failure ("You can only dereference a list or CardEntity"))
                   ), env
                 else raise (Failure ("undeclared local variable " ^ id))
             | Global, IntLiteral(i) ->
                 if NameMap.mem id globals then
                   (match NameMap.find id globals with
                     ListLiteral(ls) -> List.nth ls i
-                  | _ -> raise (Failure ("trying to dereference a non-list"))
+                  | Variable(VarExp(origid, Entity)) ->
+                      if NameMap.mem origid entities then
+                        (match NameMap.find origid entities with
+                          ListLiteral(ls) -> List.nth ls i
+                        | _ -> raise (Failure ("internal error: CardEntity "^origid^" not storing ListLiteral")))
+                      else raise (Failure ("internal error: "^id^" holding invalid reference to CardEntity "^origid))
+                  | _ -> raise (Failure ("You can only dereference a list or CardEntity"))
                   ), env
                 else raise (Failure ("undeclared global variable " ^ id))
+            | Entity, IntLiteral(i) ->
+                if NameMap.mem id entities then
+                  (match NameMap.find id entities with
+                    ListLiteral(ls) -> List.nth ls i
+                  | _ -> raise (Failure ("internal error: CardEntity "^id^" not storing ListLiteral"))
+                  ), env
+                else raise (Failure ("undeclared CardEntity " ^ id))
             | _, _ ->
                 raise (Failure ("invalid list dereference, probably using non-integer index"))
             ))
@@ -142,7 +162,7 @@ let run (vars, funcs) =
                   v, (locals, NameMap.add id v globals, entities, cards)
                 else raise (Failure ("undeclared global variable " ^ id))
             | Entity ->
-                raise (Failure ("You cannot assign to the entity"))
+                raise (Failure ("You cannot assign to a cardentity"))
             )
         | GetIndex(id, scope, index) ->
             let evalidx, env = eval env index in
@@ -158,7 +178,9 @@ let run (vars, funcs) =
                   (match NameMap.find id locals with
                     ListLiteral(ls) ->
                       v, (NameMap.add id (ListLiteral(inserthelper ls i v 0)) locals, globals, entities, cards)
-                  | _ -> raise (Failure ("trying to dereference a non-list")))
+                  | Variable(vexp) ->
+                      let ret, env = eval env (Assign(vexp, v)) in ret, env
+                  | _ -> raise (Failure ("You can only dereference a list or CardEntity")))
                 else raise (Failure ("undeclared local variable " ^ id))
             | Global, IntLiteral(i) ->
                 if NameMap.mem id globals then
@@ -171,7 +193,9 @@ let run (vars, funcs) =
                   (match NameMap.find id globals with
                     ListLiteral(ls) ->
                       v, (locals, NameMap.add id (ListLiteral(inserthelper ls i v 0)) globals, entities, cards)
-                  | _ -> raise (Failure ("trying to dereference a non-list")))
+                  | Variable(vexp) ->
+                      let ret, env = eval env (Assign(vexp, v)) in ret, env
+                  | _ -> raise (Failure ("You can only dereference a list or CardEntity")))
                 else raise (Failure ("undeclared global variable " ^ id))
             | Entity, IntLiteral(i) ->
                 raise (Failure ("You must use the transfer operator (<-) to modify CardEntity"))
@@ -257,8 +281,64 @@ let run (vars, funcs) =
           in  BoolLiteral(false), (locals, globals, entities, cards)
         with ReturnException(v, globals) -> v, (locals, globals, entities, cards)
   in
-  (* end of eval section *)
-  ...
+  (* Execute a statement and return an updated environment *)
+  (* TODO add the rest of our statements *)
+  let rec exec env = function 
+      Expr(e) -> let _, env = eval env e in env
+    | If(e, s1, s2) ->
+        let v, env = eval env e in
+        let b = (match v with
+          BoolLiteral(b) -> b
+          | _ -> raise (Failure ("Invalid conditional expression.")))
+        in
+        if b then begin
+          ignore (List.iter (fun n -> ignore(exec env n)) s1);  env end
+        else begin
+          ignore (List.iter (fun n -> ignore(exec env n)) s2);  env end    
+    | While (e, s) ->
+        let rec loop env =
+          let v, env = eval env e in
+          let b = (match v with
+          BoolLiteral(b) -> b
+          | _ -> raise (Failure ("Invalid conditional expression.")))
+          in
+          if b then begin
+          ignore (List.iter (fun n -> ignore(exec env n)) s); loop env end 
+          else env
+        in loop env
+    | Return(e) ->
+        let v, (locals, globals, entities, cards) = eval env e in
+        raise (ReturnException(v, (globals, entities, cards)))
+  in
+  (* end of statement execution *)
 
+  (* XXX make sure globals are bound correctly when entering a function. probably this section *)
+  (*let evaluatedActuals = List.map eval env actuals*)
+  
+  (* call: enter the function: bind actual values to formal args *)
+  let locals =
+    try List.fold_left2
+      (fun locals formal actual -> NameMap.add formal actual locals)
+      NameMap.empty fdecl.formals actuals
+    with Invalid_argument(_) ->
+      raise (Failure ("wrong number of arguments to " ^ fdecl.fname))
+  in
+  let locals = List.fold_left   (* Set local variables to Null (undefined) *)
+    (fun locals local -> NameMap.add local Null locals)
+    locals fdecl.locals
+  in   (* Execute each statement; return updated global symbol table *)
+  snd (List.fold_left exec (locals, globals, entities, cards) fdecl.body)
+
+(* run: set global variables to Null; find and run "start" *)
+(* TODO instead of setting global vars to Null, read them from the globals block *)
+(* TODO initialize the cards symbol table to point to some generic owner (the deck?) *)
 in
-...
+let globals = List.fold_left
+  (fun globals vdecl -> NameMap.add vdecl Null globals)
+  NameMap.empty vars
+in
+try
+  (* XXX should actuals be command line args instead of [] ? *)
+  call (NameMap.find "start" func_decls) [] globals entities cards
+with Not_found ->
+  raise (Failure ("did not find the start() function"))
