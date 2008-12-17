@@ -18,8 +18,9 @@ type t =
   | CardEntity (* "CardEntity" reference type *)
   | ListType (* "list" type. elements of a list can be expressions. *)
 
-(* Variable declaration, contains the id and the type of the variable *)
-type vardec = VarDec of string * t
+(* Variable declaration, contains the id of of the variable *)
+type vardec = 
+    VarDec of string
 
 (* Variable used in an expression, contains the id and scope of the variable *)
 (* Also can be a "GetIndex", which is a list dereference with string being *)
@@ -78,7 +79,6 @@ type stmt =
 
 (* Standard function declaration *)
 type func_decl = {
-    rtype : t;
     fname : string;
     formals : vardec list;
     locals : vardec list;

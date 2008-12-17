@@ -61,7 +61,8 @@ rule token = parse
 | "string"           { STRING }
 | "true"             { TRUE(true) }
 | "while"            { WHILE }
-| "WinCondition" { WINCONDITION }
+| "WinCondition"     { WINCONDITION }
+| "var"              { VAR }
 | ['H' 'D' 'C' 'S']("J" | "Q" | "K" | "A" | "10" | ['2'-'9']) as
     lxm { CARDLITERAL(lxm) }
 | ['0'-'9']+ as 
