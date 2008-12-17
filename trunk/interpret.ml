@@ -239,7 +239,7 @@ let run (vars, funcs) =
               (if NameMap.mem oldowner entities then
                 let oldownercards = NameMap.find oldowner entities in
                   (match oldownercards with
-                    ListLiteral(c1) -> NameMap.add oldowner (deletehelper c1 evalc) entities
+                    ListLiteral(c1) -> NameMap.add oldowner (ListLiteral(deletehelper c1 evalc)) entities
                   | _ -> raise (Failure ("internal error: CardEntity "^id^" not storing ListLiteral")))
               else raise (Failure ("internal error: Card "^c^" invalid owner "^oldowner))
               ) in
@@ -256,7 +256,7 @@ let run (vars, funcs) =
                 let entitycards = NameMap.find id entities in
                 (match entitycards with
                   ListLiteral(c2) ->
-                    StringLiteral(id), (locals, globals, NameMap.add id (insertunique c2 evalc) entities, cards)
+                    StringLiteral(id), (locals, globals, NameMap.add id (ListLiteral(insertunique c2 evalc)) entities, cards)
                 | _ -> raise (Failure ("internal error: CardEntity "^id^" not storing ListLiteral")))
               else raise (Failure ("Invalid CardEntity: " ^ id))
 
