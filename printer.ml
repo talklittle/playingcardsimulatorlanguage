@@ -71,11 +71,11 @@ let rec string_of_stmt t stmt = tabs t ^ match stmt with
       tabs t ^ "} else {\n" ^ 
       String.concat "" (List.map (string_of_stmt (t+1)) s2) ^ 
       tabs t ^ "}\n"
-  | For(e1, e2, e3, s) ->
+(*| For(e1, e2, e3, s) ->
       "for (" ^ string_of_expr e1  ^ "; " ^ string_of_expr e2 ^ "; " ^
       string_of_expr e3  ^ ") {\n" ^ 
       String.concat "" (List.map (string_of_stmt (t+1)) s) ^ 
-      tabs t ^ "}\n"
+      tabs t ^ "}\n" *)
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") {\n" ^ 
       String.concat "" (List.map (string_of_stmt (t+1)) s) ^ 
       tabs t ^ "}\n"

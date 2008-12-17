@@ -69,7 +69,7 @@ type stmt =
                                        (* stmt list is executed when the *)
                                        (* expr is true, otherwise execute *)
                                        (* the second stmt list *)
-  | For of expr * expr * expr * stmt list (* Expressions are, in order, the *)
+(* | For of expr * expr * expr * stmt list Expressions are, in order, the *)
                                           (* initialization, truth condition *)
                                           (* and finally update step *)
   | While of expr * stmt list (* As long as expr is true, execute stmt list *)

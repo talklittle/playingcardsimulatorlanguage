@@ -52,11 +52,11 @@ Start // Deal cards, set chips
 	shuffle($dealer);
 
 	// deal out 5 cards to each player
-	for (i = 0; i < 5; i++)	{
-	   for (j = 0; j < listLength(#players); j++) {
-	       #players[j] <- $dealer[0];
-	   }
-	}
+	//for (i = 0; i < 5; i++)	{
+	//   for (j = 0; j < listLength(#players); j++) {
+	//       #players[j] <- $dealer[0];
+	//   }
+	//}
 }
 
 Play 
@@ -64,9 +64,9 @@ Play
 {
 	int i;
 
-	for (i = 0; i < size(#players); i++) {
-	    play(#players[i]);
-	}
+	//for (i = 0; i < size(#players); i++) {
+	//    play(#players[i]);
+	//}
 
 	while (#doneBidding[0] && #doneBidding[1]) {
 	   play($player0);
