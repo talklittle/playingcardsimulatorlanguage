@@ -16,19 +16,19 @@ CardEntities
 
 Globals // Global variables are addressed with '#'
 {
-	int currentPot;
-	int lastBid;
-	list chips;
-	list players;
-	list doneBidding;
-	string message;
+	var currentPot;
+	var lastBid;
+	var chips;
+	var players;
+	var doneBidding;
+	var message;
 }
 
 Start // Deal cards, set chips
 {
-	int i;
-	int j;
-	Card c;
+	var i;
+	var j;
+	var c;
 
 	//
 	// initialize global variables
@@ -62,7 +62,7 @@ Start // Deal cards, set chips
 Play 
 // Play functionality associated with a "round" of play
 {
-	int i;
+	var i;
 
 	//for (i = 0; i < size(#players); i++) {
 	//    play(#players[i]);
@@ -93,11 +93,11 @@ WinCondition
 	return null;
 }
 
-int play(CardEntity e) 
+play(var e) 
 // Play function
 {
-	int i;
-	int bid;
+	var i;
+	var bid;
 
 	i = indexOf(#players, e);
 	#doneBidding[i] = false;
@@ -113,10 +113,10 @@ int play(CardEntity e)
 
 	#doneBidding[i] = true;
 
-	return 1;
+	return;
 }
 
-int evaluateHandWinner(list lc, int round)
+evaluateHandWinner(var lc, var round)
 {
 	//The best poker hand wins
 

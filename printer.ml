@@ -33,7 +33,7 @@ let string_of_scope scope = match scope with
   | Entity  -> "$"
 
 let string_of_vardec v = match v with
-    VarDec(id, t) -> string_of_t t ^ " " ^ id
+    VarDec(id) -> "var " ^ id
 
 let rec string_of_varexp v = match v with
   | VarExp(id, s) -> string_of_scope s ^ id
@@ -88,7 +88,7 @@ let string_of_vdecl v =
   "\t" ^ string_of_vardec v ^ ";\n"
 
 let string_of_fdecl fdecl =
-  string_of_t fdecl.rtype ^ " " ^ fdecl.fname ^ "(" ^ 
+  fdecl.fname ^ "(" ^ 
   String.concat ", " (List.map string_of_vardec fdecl.formals) ^ ")\n{\n" ^
   String.concat "" (List.map string_of_vdecl fdecl.locals) ^
   String.concat "" (List.map (string_of_stmt 1) fdecl.body) ^

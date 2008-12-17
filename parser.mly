@@ -6,7 +6,7 @@
 %token GLOBALVAR ENTITYVAR
 %token PRINT READ
 %token RETURN IF ELSE FOR WHILE BREAK CONTINUE 
-%token BOOL INT STRING CARD CARDENTITY LIST
+%token BOOL INT STRING CARD CARDENTITY LIST VAR
 %token CARDENTITIES GLOBALS INCLUDE PLAY START WINCONDITION
 %token NULL GETTYPE
 %token <bool> TRUE FALSE
@@ -30,7 +30,7 @@
 %left PLUS MINUS
 %left TIMES DIVIDE
 %left PLUSTWO MINUSTWO
-%left BOOL INT STRING CARD CARDENTITY LIST
+%left BOOL INT STRING CARD CARDENTITY LIST VAR
 %left TILDE GETTYPE
 %left GLOBALVAR ENTITYVAR
 
@@ -64,20 +64,11 @@ funcs_list:
   | funcs_list fdecl { $2 :: $1 }
 
 fdecl:
-    return_type ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
-    { { rtype = $1;
-        fname = $2;
-	formals = $4;
-	locals = List.rev $7;
-	body = List.rev $8 } }
-
-return_type:
-    INT { Int }
-  | STRING { StringType }
-  | BOOL { Bool }
-  | CARD { Card }
-  | CARDENTITY { CardEntity }
-  | LIST { ListType }
+    ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
+    { { fname = $1;
+	formals = $3;
+	locals = List.rev $6;
+	body = List.rev $7 } }
 
 formals_opt:
     /* nothing */ { [] }
@@ -106,12 +97,7 @@ vdecl_list:
   | vdecl_list vdecl SEMI { $2 :: $1 }
 
 vdecl:
-    INT ID { VarDec($2, Int) }
-  | STRING ID { VarDec($2, StringType) }
-  | BOOL ID { VarDec($2, Bool) }
-  | CARD ID { VarDec($2, Card) }
-  | CARDENTITY ID { VarDec($2, CardEntity) }
-  | LIST ID { VarDec($2, ListType) }
+    VAR ID  { VarDec($2) }
 
 stmt_list:
     /* nothing */  { [] }
