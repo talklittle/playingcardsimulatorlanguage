@@ -132,9 +132,9 @@ stmt:
 /*      { For($3, $5, $7, $10) } */
   | WHILE LPAREN expr RPAREN LBRACE stmt_list RBRACE { While($3, $6) }
 
-expr_opt:
-    /* nothing */ { Noexpr }
-  | expr          { $1 }
+/*expr_opt: */
+    /* nothing */ /*{ Noexpr }*/
+/*  | expr          { $1 }*/
 
 expr:
     NULL             { Null }
