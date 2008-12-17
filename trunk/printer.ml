@@ -119,3 +119,7 @@ let string_of_program (spec, funcs) =
   string_of_sdecl_3 "WinningCondition" spec.wcon.wlocals spec.wcon.wbody 
   ^ "\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs)
+
+let string_of_include_file (funcs) =
+  String.concat "\n" (List.map string_of_fdecl funcs)
+
