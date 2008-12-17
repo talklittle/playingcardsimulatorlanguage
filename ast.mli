@@ -25,7 +25,7 @@ type vardec = VarDec of string * t
 (* Also can be a "GetIndex", which is a list dereference with string being *)
 (* the list variable, and expr being the expression within the brackets. *)
 type varexp = 
-    VarExp of string * scope
+    VarExp of string * scope (* Used by interpreter to store CardEntity refs *)
   | GetIndex of string * scope * expr
 
 (* The expression type *)
@@ -44,8 +44,9 @@ and expr =
                  (* needs to check that its expression evaluates to "int" *)
   | Assign of varexp * expr (* Assignment of an expression to a variable *)
   | Append of expr * expr (* Appending to a list variable *)
+  | GetType of expr (* Returns the string description of the type of expr *)
   | ListLength of expr (* Should evaluate to the length of a list *)
-  | Transfer of expr * expr (* The transfer operator, e.g $player1 <- H1. *)
+  | Transfer of varexp * expr (* The transfer operator, e.g $player1 <- H1. *)
                               (* The interpreter needs to check that the lhs *)
                               (* evaluates to CardEntity and rhs evaluates *)
                               (* to Card *)

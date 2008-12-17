@@ -35,6 +35,7 @@ rule token = parse
 | '|'      { BAR }
 | '~'      { TILDE }
 | '^'      { CONCAT }
+| '@'      { GETTYPE }
 | '#'      { GLOBALVAR }
 | '$'      { ENTITYVAR }
 | "<<"     { PRINT }

@@ -25,12 +25,12 @@ let rec string_of_t t = match t with
   | Bool       -> "bool"
   | Card       -> "Card"
   | CardEntity -> "CardEntity"
-  | ListType  -> "list"
+  | ListType   -> "list"
 
 let string_of_scope scope = match scope with
     Global  -> "#"
   | Local   -> ""
-  | Entity   -> "$"
+  | Entity  -> "$"
 
 let string_of_vardec v = match v with
     VarDec(id, t) -> string_of_t t ^ " " ^ id
@@ -53,8 +53,9 @@ and string_of_expr expr = match expr with
   | Rand(e) -> "~" ^ string_of_expr e
   | Assign(v, e) -> string_of_varexp v ^ " = " ^ string_of_expr e
   | ListLength(e) -> "|" ^ string_of_expr e ^ "|"
+  | GetType(e) -> "@(" ^ string_of_expr e ^ ")"
   | Append(e1, e2) -> string_of_expr e1 ^ "::" ^ string_of_expr e2
-  | Transfer(e1, e2) -> string_of_expr e1 ^ " <- " ^ string_of_expr e2
+  | Transfer(v, e) -> string_of_varexp v ^ " <- " ^ string_of_expr e
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
