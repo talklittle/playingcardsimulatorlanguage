@@ -127,9 +127,9 @@ stmt:
       { If($3, $6, []) }
   | IF LPAREN expr RPAREN LBRACE stmt_list RBRACE ELSE LBRACE stmt_list RBRACE
       { If($3, $6, $10) }
-  | FOR LPAREN expr_opt SEMI expr_opt SEMI expr_opt RPAREN 
-      LBRACE stmt_list RBRACE
-      { For($3, $5, $7, $10) }
+/*  | FOR LPAREN expr_opt SEMI expr_opt SEMI expr_opt RPAREN */
+/*      LBRACE stmt_list RBRACE */
+/*      { For($3, $5, $7, $10) } */
   | WHILE LPAREN expr RPAREN LBRACE stmt_list RBRACE { While($3, $6) }
 
 expr_opt:
