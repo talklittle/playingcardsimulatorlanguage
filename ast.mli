@@ -133,3 +133,5 @@ type spec_decl = {
 
 (* The program. Contains the special declarations and function declarations *)
 type program = spec_decl * func_decl list
+
+
