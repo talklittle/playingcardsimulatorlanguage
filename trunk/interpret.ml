@@ -24,8 +24,8 @@ let run (vars, funcs) =
 
   (* Evaluate an expression and return (value, updated environment) *)
   let rec eval env = function
-      Null -> Null, env  (* XXX ok to return "null" here? *)
-    | Noexpr -> Noexpr, env (* must be non-zero for the loop predicate *)
+      Null -> Null, env
+    | Noexpr -> Noexpr, env
 
     | IntLiteral(i) -> IntLiteral(i), env
     | StringLiteral(i) -> StringLiteral(i), env
@@ -63,20 +63,20 @@ let run (vars, funcs) =
         | BoolLiteral(i1),   Neq, BoolLiteral(i2)   -> boolean (string_of_bool i1 <> string_of_bool i2)
         | IntLiteral(i1),    Less, IntLiteral(i2)    -> boolean (i1 < i2)
         | StringLiteral(i1), Less, StringLiteral(i2) -> boolean (i1 < i2)
-        | CardLiteral(i1),   Less, CardLiteral(i2)   -> boolean (i1 < i2) (* XXX cmp cards as string? *)
+        | CardLiteral(i1),   Less, CardLiteral(i2)   -> boolean (i1 < i2) (* cmp cards as string? *)
         | IntLiteral(i1),    Leq, IntLiteral(i2)    -> boolean (i1 <= i2)
         | StringLiteral(i1), Leq, StringLiteral(i2) -> boolean (i1 <= i2)
-        | CardLiteral(i1),   Leq, CardLiteral(i2)   -> boolean (i1 <= i2) (* XXX cmp cards as string? *)
+        | CardLiteral(i1),   Leq, CardLiteral(i2)   -> boolean (i1 <= i2) (* cmp cards as string? *)
         | IntLiteral(i1),    Greater, IntLiteral(i2)    -> boolean (i1 > i2)
         | StringLiteral(i1), Greater, StringLiteral(i2) -> boolean (i1 > i2)
-        | CardLiteral(i1),   Greater, CardLiteral(i2)   -> boolean (i1 > i2) (* XXX cmp cards as string? *)
+        | CardLiteral(i1),   Greater, CardLiteral(i2)   -> boolean (i1 > i2) (* cmp cards as string? *)
         | IntLiteral(i1),    Geq, IntLiteral(i2)    -> boolean (i1 >= i2)
         | StringLiteral(i1), Geq, StringLiteral(i2) -> boolean (i1 >= i2)
-        | CardLiteral(i1),   Geq, CardLiteral(i2)   -> boolean (i1 >= i2) (* XXX cmp cards as string? *)
+        | CardLiteral(i1),   Geq, CardLiteral(i2)   -> boolean (i1 >= i2) (* cmp cards as string? *)
         | BoolLiteral(i1), And, BoolLiteral(i2) -> boolean (i1 && i2)
         | BoolLiteral(i1), Or, BoolLiteral(i2)  -> boolean (i1 || i2)
 
-        | StringLiteral(i1), Concat, StringLiteral(i2) -> StringLiteral(i1 ^ i2)  (* XXX we want String concat, right? *)
+        | StringLiteral(i1), Concat, StringLiteral(i2) -> StringLiteral(i1 ^ i2)  (* we want String concat, right? *)
 
         | _, _, _ ->
             raise (Failure ("invalid binary operation"))
@@ -94,7 +94,7 @@ let run (vars, funcs) =
           VarExp(id, scope) ->
             (match scope with
               Local ->
-                (* NameMap maps var names to (literalvalue) *)
+                (* NameMap maps var name to (literalvalue) *)
                 if NameMap.mem id locals then
                   NameMap.find id locals, env
                 else raise (Failure ("undeclared local variable " ^ id))
@@ -102,7 +102,6 @@ let run (vars, funcs) =
                 if NameMap.mem id globals then
                   NameMap.find id globals, env
                 else raise (Failure ("undeclared global variable " ^ id))
-            (* XXX are CardEntities retrieved this way? What expression do they evaluate to? *)
             | Entity ->
                 if NameMap.mem id entities then
                   NameMap.find id entities, env
@@ -142,11 +141,8 @@ let run (vars, funcs) =
                 if NameMap.mem id globals then
                   v, (locals, NameMap.add id v globals, entities, cards)
                 else raise (Failure ("undeclared global variable " ^ id))
-            (* XXX are entities assigned this way too? *)
             | Entity ->
-                if NameMap.mem id entities then
-                  v, (locals, globals, NameMap.add id v entities, cards)
-                else raise (Failure ("undeclared CardEntity " ^ id))
+                raise (Failure ("You cannot assign to the entity"))
             )
         | GetIndex(id, scope, index) ->
             let evalidx, env = eval env index in
@@ -177,33 +173,8 @@ let run (vars, funcs) =
                       v, (locals, NameMap.add id (ListLiteral(inserthelper ls i v 0)) globals, entities, cards)
                   | _ -> raise (Failure ("trying to dereference a non-list")))
                 else raise (Failure ("undeclared global variable " ^ id))
-            (* XXX Entities are treated the same way for assigning to a GetIndex?
             | Entity, IntLiteral(i) ->
-                if NameMap.mem id entities then
-                  let rec inserthelper ls targetindex value curr =
-                    (match ls, curr with
-                      _ :: tl, targetindex  -> value :: tl
-                    | [], _                 -> raise (Failure ("index out of bounds"))
-                    | hd :: tl, _           -> hd :: (inserthelper tl targetindex value (curr+1))
-                  in
-                  (match v, NameMap.find id entities with
-                    IntLiteral(_), (ListLiteral(ls), Int) ->
-                      v, (locals, globals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Int) entities, cards)
-                  | StringLiteral(_), (ListLiteral(ls), StringType) ->
-                      v, (locals, globals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), StringType) entities, cards)
-                  | BoolLiteral(_), (ListLiteral(ls), Bool) ->
-                      v, (locals, globals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Bool) entities, cards)
-                  | CardLiteral(_), (ListLiteral(ls), Card) ->
-                      v, (locals, globals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), Card) entities, cards)
-                    (* FIXME what expression do CardEntities have?
-                  | CardEntityLiteral(_), (ListLiteral(ls), CardEntity) ->
-                      v, (locals, globals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), CardEntity) entities, cards)
-                    *)
-                  | ListLiteral(_), (ListLiteral(ls), Card) ->
-                      v, (locals, globals, NameMap.add id ((ListLiteral(inserthelper ls i v 0)), List) entities, cards)
-                  | _, _ -> raise (Failure ("trying to dereference a non-list")))
-                else raise (Failure ("undeclared CardEntity " ^ id))
-            *)
+                raise (Failure ("You must use the transfer operator (<-) to modify CardEntity"))
             | _, _ ->
                 raise (Failure ("invalid list dereference, probably using non-integer index"))
             ))
