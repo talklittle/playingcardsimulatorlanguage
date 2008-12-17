@@ -8,7 +8,7 @@
 %token RETURN IF ELSE FOR WHILE BREAK CONTINUE 
 %token BOOL INT STRING CARD CARDENTITY LIST
 %token CARDENTITIES GLOBALS INCLUDE PLAY START WINCONDITION
-%token NULL
+%token NULL GETTYPE
 %token <bool> TRUE FALSE
 %token <int> INTLITERAL
 %token <string> STRINGLITERAL
@@ -145,6 +145,7 @@ expr:
   | STRINGLITERAL    { StringLiteral($1) }
   | var              { Variable($1) }
   | TILDE expr       { Rand($2) }
+  | GETTYPE expr     { GetType($2) }
   | expr PLUS     expr { Binop($1, Add,   $3) }
   | expr MINUS    expr { Binop($1, Sub,   $3) }
   | expr TIMES    expr { Binop($1, Mult,  $3) }
@@ -166,10 +167,10 @@ expr:
       { Assign($1, Binop(Variable($1), Add, IntLiteral(1))) }
   | var MINUSTWO       
       { Assign($1, Binop(Variable($1), Sub, IntLiteral(1))) }
-  | var ASSIGN    expr { Assign($1, $3) }
+  | var ASSIGN expr { Assign($1, $3) }
   | expr APPEND expr { Append($1, $3) }
   | BAR expr BAR { ListLength($2) }
-  | expr TRANSFER  expr { Transfer($1, $3) }
+  | var TRANSFER expr { Transfer($1, $3) }
   | LBRACK list_opt RBRACK { ListLiteral($2) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }

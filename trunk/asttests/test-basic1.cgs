@@ -18,9 +18,9 @@ Globals // Global variables are addressed with '#'
 {
 	int currentPot;
 	int lastBid;
-	list<int> chips;
-	list<CardEntity> players;
-	list<bool> doneBidding;
+	list chips;
+	list players;
+	list doneBidding;
 	string message;
 }
 
@@ -116,10 +116,10 @@ int play(CardEntity e)
 	return 1;
 }
 
-int evaluateHandWinner(list<Card> lc, int round)
+int evaluateHandWinner(list lc, int round)
 {
 	//The best poker hand wins
 
-	return 1;
+	return @1;
 }	
 
