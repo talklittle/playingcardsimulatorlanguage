@@ -11,7 +11,7 @@ exception ReturnException of Ast.expr * Ast.expr NameMap.t * Ast.expr NameMap.t 
 exception GameOverException of Ast.expr
 
 (* seed random number generator with current time *)
-let _ = Random.init (truncate (42.0)) (* FIX ME *)
+let _ = Random.init (truncate (Unix.time()))
 let entityData = []
 
 (* Main entry point: run a program *)
