@@ -2,7 +2,7 @@
 
 Include
 {
-	stdlib.cgl;
+	stdlib/stdlib.cgl;
 }
 
 CardEntities 
@@ -24,13 +24,13 @@ Start // Deal cards, set chips
 	var i;
 	var e;
 
-	players = [$player1, $player2, $player3, $player4];
+	#players = [$player0, $player1, $player2, $player3];
 
 	shuffle($dealer);
 
 	i = 0;
-	while (i < |players|) {
-	      e = players[i];	      
+	while (i < |#players|) {
+	      e = #players[i];	      
 
 	      // Deal five cards to the player.
 	      e <- $dealer[0];
@@ -61,31 +61,31 @@ WinCondition
 	var card3;
 	var card4;
 	
-	card1 = high_card($player1);
+	card1 = high_card($player0);
 	<< "Player 1 high card : " ^ card1 ^ "\n";
-	card2 = high_card($player2);
+	card2 = high_card($player1);
 	<< "Player 2 high card : " ^ card2 ^ "\n";
-	card3 = high_card($player3);
+	card3 = high_card($player2);
 	<< "Player 3 high card : " ^ card3 ^ "\n";
-	card4 = high_card($player4);
+	card4 = high_card($player3);
 	<< "Player 4 high card : " ^ card4 ^ "\n";
 
 	comp = card_compare(card1, card2);
 	if (comp > 0) {
-	   highplayer = $player1;
+	   highplayer = $player0;
 	   highcard = card1;
 	} else {
-	   highplayer = $player2;
+	   highplayer = $player1;
 	   highcard = card2;
 	}
 	comp = card_compare(highcard, card3);
 	if (comp < 0) {
-	   highplayer = $player3;
+	   highplayer = $player2;
 	   highcard = card3;
 	}
 	comp = card_compare(highcard, card4);
 	if (comp < 0) {
-	   highplayer = $player4;
+	   highplayer = $player3;
 	   highcard = card4;
 	}
 
