@@ -122,22 +122,27 @@ play(var e)
 	if ( bid == null) {
 	<<"bid ok";
 	}
-	<<bid;
+	<<"Bid: " ^ bid;
+	<<returnFive();
 	bid < #lastBid;
 	<<"bid 2 ok";
 	if (bid == null || bid < #lastBid) // haven't bet or overbet
 	{
 	   >> bid; // input a bet (auto convert input to type of 'bid')
-	   #chips[i] -= bid; // subtract bet from your current chips
+	   #chips[0] -= bid; // subtract bet from your current chips
 	   #currentPot += bid; // add bet to the current pot
 	   #lastBid = bid; // record the last bid to check overbets
 	}
 
-	#doneBidding[i] = true;
+	#doneBidding[0] = true;
 
 	return;
 }
 
+returnFive ()
+{
+return 5;
+}
 evaluateHandWinner(var lc, var round)
 {
 	//The best poker hand wins
