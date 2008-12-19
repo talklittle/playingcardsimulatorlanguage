@@ -97,7 +97,7 @@ vdecl_list:
   | vdecl_list vdecl SEMI { $2 :: $1 }
 
 vdecl:
-    VAR ID  { VarDec($2) }
+    VAR ID  { $2 }
 
 stmt_list:
     /* nothing */  { [] }
