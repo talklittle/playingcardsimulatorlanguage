@@ -472,8 +472,11 @@ try
       let rec loop a (globals, entities, cards) =
         let (globals, entities, cards) = 
             call (NameMap.find "Play" func_decls) [] globals entities cards
-        in        
-        try
+        in  
+        let (globals, entities, cards) = 
+                call (NameMap.find "WinningCondition" func_decls) [] globals entities cards
+        in loop a   (globals, entities, cards)    
+        (*try
             let (globals, entities, cards) = 
                 call (NameMap.find "WinningCondition" func_decls) [] globals entities cards
             in (globals, entities, cards)
@@ -482,7 +485,7 @@ try
         if (v == null || v == []) then
             loop a (globals, entities, cards)
         else
-            raise (GameOverException (v))
+            raise (GameOverException (v))*)
             
       in loop "blah" (globals, entities, cards)
   
