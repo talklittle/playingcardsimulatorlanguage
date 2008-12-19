@@ -126,6 +126,9 @@ play(var e)
 	<<returnFive();
 	bid < #lastBid;
 	<<"bid 2 ok";
+	>>i;
+	<<"You gave input " ^ i;
+	
 	if (bid == null || bid < #lastBid) // haven't bet or overbet
 	{
 	   >> bid; // input a bet (auto convert input to type of 'bid')
