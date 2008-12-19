@@ -1,0 +1,71 @@
+// A program that implements a very simple simulation of Poker for 4 players.
+
+Include
+{
+	"stdlib/stdlib.cgl";
+}
+
+CardEntities 
+{
+	deck;
+	player1;
+	player2;
+}
+
+Globals
+{
+}
+
+Start
+{
+	var i;
+	var r;
+
+	i = 0;
+
+	while (i < 52) {
+		r = ~1;
+		<< r;
+		if (r == 0) {
+			$player1 <- $deck[0];
+		} else {
+			$player2 <- $deck[0];
+		}
+		i++;
+	}
+
+	// print out each player's cards
+
+	i = 0;
+	<< "player 1:";
+	while (i < |$player1|) {
+		<< $player1[i];
+
+		i++;
+        }
+
+	i = 0;
+	<< "player 2:";
+	while (i < |$player2|) {
+		<< $player2[i];
+
+		i++;
+        }
+}
+
+Play 
+{
+}
+
+WinCondition 
+{
+	if (|$player1| > |$player2|) {
+		return [$player1];
+	} else {
+		if (|$player2| > |$player1|) {
+			return [$player2];
+		} else {
+			return [];
+		}
+	}
+}
