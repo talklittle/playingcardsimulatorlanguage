@@ -24,8 +24,7 @@ Start // Deal cards, set chips
 	var i;
 	var e;
 
-
-	<<"Hellow and Welcome to PCGSL Poker!";
+	<<"Hello and Welcome to PCGSL Poker!";
 	
 	#players = [$player0, $player1, $player2, $player3];
 
