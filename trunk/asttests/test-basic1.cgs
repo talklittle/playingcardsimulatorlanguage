@@ -1,7 +1,7 @@
 Include
 // Include library files according to some path environment variable.
 {
-	stdlib.cgl;
+	"stdlib/stdlib.cgl";
 }
 
 CardEntities 
