@@ -295,13 +295,6 @@ let run (program) =
             else raise (Failure ("Invalid card name: " ^ c))
         | _, _ -> raise (Failure ("Transfer: arguments must be cardentity <- card")))
 
-    (* FIXME can't assume everything is int
-    | Call("print", [e]) ->
-        let v, env = eval env e in
-        print_endline (string_of_int v);
-        0, env
-    *)
-
     | Call(f, actuals) ->
         let fdecl =
           try NameMap.find f func_decls
@@ -368,9 +361,6 @@ let run (program) =
   in
   (* end of statement execution *)
 
-  (* XXX make sure globals are bound correctly when entering a function. probably this section *)
-  (*let evaluatedActuals = List.map eval env actuals*)
-  
   (* call: enter the function: bind actual values to formal args *)
   let locals =
     try List.fold_left2
