@@ -121,9 +121,9 @@ rule token = parse
     lxm { INTLITERAL(int_of_string lxm) }
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as 
     lxm { ID(lxm) }
-| '\"'[^ '\n' '\t' '\b' '\r' '\\' '\'' '\"']*'\"' as 
+| '\"'[^ '\"']*'\"' as 
     lxm { STRINGLITERAL(String.sub lxm 1 ((String.length lxm) - 2)) }
-| ['a'-'z' 'A'-'Z' '0'-'9' '_' '.']+ as
+| ['a'-'z' 'A'-'Z' '0'-'9' '_' '.' '/']+ as
     lxm { FILE(lxm) }
 | eof { EOF }
 | _ as 
