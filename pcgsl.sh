@@ -3,5 +3,5 @@
 OCAMLRUNPARAM="p,b"
 export OCAMLRUNPARAM
 
-./pcgsl
+./pcgsl $1
 
