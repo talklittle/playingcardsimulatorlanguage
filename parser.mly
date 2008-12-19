@@ -14,7 +14,6 @@
 %token <string> STRINGLITERAL
 %token <string> CARDLITERAL
 %token <string> ID
-%token <string> FILE
 %token EOF
 
 %nonassoc NOELSE
@@ -83,7 +82,7 @@ idecl_list:
   | idecl_list idecl { $2 :: $1 }
 
 idecl:
-    FILE SEMI { $1 }
+    STRINGLITERAL SEMI { $1 }
 
 cdecl_list:
     /* nothing */    { [] }
