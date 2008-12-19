@@ -15,7 +15,11 @@ let _ = Random.init (42)
 
 (* Main entry point: run a program *)
 
-let run (spec, funcs) =
+let run (program) =
+    let spec = fst(program)
+    in
+    let funcs = snd(program)
+    in
   (* Put function declarations in a symbol table *)
   let func_decls = List.fold_left
       (fun funcs fdecl -> NameMap.add fdecl.fname fdecl funcs)
@@ -395,6 +399,31 @@ try
   in
   let func_decls = NameMap.add "Start" startDecl func_decls
   in
-  call (NameMap.find "Start" func_decls) [] globals entities cards
-with Not_found ->
+  let startDecl = { fname = "Play";
+                formals = []; 
+                locals = spec.play.plocals; 
+                body=spec.play.pbody } 
+  in
+  let func_decls = NameMap.add "Play" startDecl func_decls
+  in
+  let startDecl = { fname = "WinningCondition";
+                formals = []; 
+                locals = spec.wcon.wlocals; 
+                body=spec.wcon.wbody } 
+  in
+  let func_decls = NameMap.add "WinningCondition" startDecl func_decls
+  in
+  begin
+      call (NameMap.find "Start" func_decls) [] globals entities cards;
+      let rec loop a =
+        let p = 
+            call (NameMap.find "Play" func_decls) [] globals entities cards
+        in
+        let w = call (NameMap.find "WinningCondition" func_decls) [] globals entities cards
+        in
+        loop a
+      in loop
+  end
+  with Not_found ->
   raise (Failure ("did not find the start() function"))
+ 
