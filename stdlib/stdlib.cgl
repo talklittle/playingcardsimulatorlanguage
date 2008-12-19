@@ -65,6 +65,20 @@ stringtocard(var s) {
 // *******************
 
 //
+// listlength - returns the length of the given list.
+//
+// input type(s) expected: list
+// output type(s): int
+//
+listlength(var l) {
+  if (@l != "list") {
+    return null;
+  }
+
+  return |l|;
+}
+
+//
 // listfind - returns the index of the element in the given list matching the 
 //            given input item, or null if none exists. If more than one match,
 //            returns the first occurring match in the list.
@@ -203,43 +217,55 @@ cardface(var c) {
     return null;
   }
 
-  if (c == H2 || c == D2 || c == C2 || c = S2) {
+  if (c == H2 || c == D2 || c == C2 || c == S2) {
     return 2;
   }
-  if (c == H3 || c == D3 || c == C3 || c = S3) {
+
+  if (c == H3 || c == D3 || c == C3 || c == S3) {
     return 3;
   }
-  if (c == H4 || c == D4 || c == C4 || c = S4) {
+
+  if (c == H4 || c == D4 || c == C4 || c == S4) {
     return 4;
   }
-  if (c == H5 || c == D5 || c == C5 || c = S5) {
+
+  if (c == H5 || c == D5 || c == C5 || c == S5) {
     return 5;
   }
-  if (c == H6 || c == D6 || c == C6 || c = S6) {
+
+  if (c == H6 || c == D6 || c == C6 || c == S6) {
     return 6;
   }
-  if (c == H7 || c == D7 || c == C7 || c = S7) {
+
+  if (c == H7 || c == D7 || c == C7 || c == S7) {
     return 7;
   }
-  if (c == H8 || c == D8 || c == C8 || c = S8) {
+
+  if (c == H8 || c == D8 || c == C8 || c == S8) {
     return 8;
   }
-  if (c == H9 || c == D9 || c == C9 || c = S9) {
+
+  if (c == H9 || c == D9 || c == C9 || c == S9) {
     return 9;
   }
-  if (c == H10 || c == D10 || c == C10 || c = S10) {
+
+  if (c == H10 || c == D10 || c == C10 || c == S10) {
     return 10;
   }
-  if (c == HJ || c == DJ || c == CJ || c = SJ) {
+
+  if (c == HJ || c == DJ || c == CJ || c == SJ) {
     return 11;
   }
-  if (c == HQ || c == DQ || c == CQ || c = SQ) {
+
+  if (c == HQ || c == DQ || c == CQ || c == SQ) {
     return 12;
   }
-  if (c == HK || c == DK || c == CK || c = SK) {
+
+  if (c == HK || c == DK || c == CK || c == SK) {
     return 13;
   }
-  if (c == HA || c == DA || c == CA || c = SA) {
+
+  if (c == HA || c == DA || c == CA || c == SA) {
     return 1;
   }
 }
@@ -333,19 +359,17 @@ shuffle(var e) {
   i = 0;
   j = 0;
 
-  while (true) {
-    if (i >= |e|) {
-      break;
-    }
+  while (i < |e|) {
     l = l :: e[i];
     i++;
   }
+
   while (true) {
     if (i <= 0 || j >= |e|) {
       return null;
     }
     r = ~i;
-    e[j] = l[r];
+    e <- l[r];
     listremove(l, r);
     i--;
     j++;
