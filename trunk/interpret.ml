@@ -374,7 +374,12 @@ let run (program) =
     | Break ->
         env (* TODO *)
     | Read(var) ->
-        env (* TODO *)
+        let input = read_line() in
+        let v = (match input with
+            a -> StringLiteral(a)
+            |_ -> raise(Failure("Invalid input")))
+        in
+        let ret, env = eval env (Assign(var, v)) in env
     | Print(e) ->
         let v, env = eval env e in
         begin
