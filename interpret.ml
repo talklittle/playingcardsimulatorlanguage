@@ -5,14 +5,17 @@ module NameMap = Map.Make(struct
   let compare x y = Pervasives.compare x y
 end)
 
+(* return: value, globals, entities, cards *)
 exception ReturnException of Ast.expr * Ast.expr NameMap.t * Ast.expr NameMap.t * Ast.expr NameMap.t
+(* return: string or string list of winners, or [] for no winners *)
+exception GameOverException of Ast.expr
 
 (* seed random number generator with The Answer *)
 let _ = Random.init (42)
 
 (* Main entry point: run a program *)
 
-let run (vars, funcs) =
+let run (spec, funcs) =
   (* Put function declarations in a symbol table *)
   let func_decls = List.fold_left
       (fun funcs fdecl -> NameMap.add fdecl.fname fdecl funcs)
@@ -304,9 +307,9 @@ let run (vars, funcs) =
         with ReturnException(v, globals, entities, cards) -> v, (locals, globals, entities, cards)
   in
   (* Execute a statement and return an updated environment *)
-  (* TODO add the rest of our statements *)
   let rec exec env = function 
-      Expr(e) -> let _, env = eval env e in env
+      Nostmt -> env
+    | Expr(e) -> let _, env = eval env e in env
     | If(e, s1, s2) ->
         let v, env = eval env e in
         let b = (match v with
@@ -328,6 +331,12 @@ let run (vars, funcs) =
           ignore (List.iter (fun n -> ignore(exec env n)) s); loop env end 
           else env
         in loop env
+    | Break ->
+        env (* TODO *)
+    | Read(var) ->
+        env (* TODO *)
+    | Print(e) ->
+        env (* TODO *)
     | Return(e) ->
         let v, (locals, globals, entities, cards) = eval env e in
         raise (ReturnException(v, globals, entities, cards))
