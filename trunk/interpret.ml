@@ -347,8 +347,9 @@ let run (program) =
             let str = (match v with
           BoolLiteral(b) -> string_of_bool b
           |IntLiteral(i) -> string_of_int i
-          |CardLiteral(c) -> "[Card: " ^ c 
+          |CardLiteral(c) -> "[Card: " ^ c ^ "]"
           |StringLiteral(s) -> s
+          | Variable(VarExp(id, Entity)) -> "[Card Entity: " ^ id ^ "]"
           | _ -> raise (Failure ("Invalid print expression.")))
           in
             print_endline str;
@@ -419,17 +420,18 @@ try
   in
   let func_decls = NameMap.add "WinningCondition" startDecl func_decls
   in
-  begin
-      call (NameMap.find "Start" func_decls) [] globals entities cards;
+  let (globals, entities, cards) =
+    call (NameMap.find "Start" func_decls) [] globals entities cards
+    in
       let rec loop a =
-        let p = 
+        let (globals, entities, cards) = 
             call (NameMap.find "Play" func_decls) [] globals entities cards
         in
-        let w = call (NameMap.find "WinningCondition" func_decls) [] globals entities cards
+        let (globals, entities, cards) = call (NameMap.find "WinningCondition" func_decls) [] globals entities cards
         in
         loop a
       in loop "blah"
-  end
+  
   with Not_found ->
   raise (Failure ("did not find the start() function"))
  
