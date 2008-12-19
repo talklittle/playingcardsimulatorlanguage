@@ -113,7 +113,7 @@ play(var e)
 	//#doneBidding[i] = false;
 	//<< "" ^ e; // print the cards of this card entity
 	i =0;
-	while (i<|e|)
+	while (i<5)
 	{
 		<<e[i];
 	}
