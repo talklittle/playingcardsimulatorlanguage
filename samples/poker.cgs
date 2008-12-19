@@ -24,10 +24,15 @@ Start // Deal cards, set chips
 	var i;
 	var e;
 
+
+	<<"Hellow and Welcome to PCGSL Poker!";
+	
 	#players = [$player0, $player1, $player2, $player3];
 
+	<<"Shuffling deck";
 	shuffle($dealer);
-
+	<<#players[0];
+	<<"Dealing Cards " ^ #players[0];
 	i = 0;
 	while (i < |#players|) {
 	      e = #players[i];	      
