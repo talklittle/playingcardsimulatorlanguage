@@ -1,4 +1,4 @@
-let print = true
+let print = false
 
 let _ =
   let lexbuf = Lexing.from_channel stdin in
@@ -6,6 +6,6 @@ let _ =
   if print then 
     let listing = Printer.string_of_program program in  
     print_string listing 
-(*  else *)
-(*    ignore (Interpret.run program) *)
+  else 
+    ignore (Interpret.run program) 
       
