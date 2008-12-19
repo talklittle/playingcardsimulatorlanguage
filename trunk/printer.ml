@@ -52,7 +52,7 @@ and string_of_expr expr = match expr with
       ^ string_of_op o ^ " " ^ string_of_expr e2 ^ ")"
   | Rand(e) -> "~" ^ string_of_expr e
   | Assign(v, e) -> string_of_varexp v ^ " = " ^ string_of_expr e
-  | ListLength(v) -> "|" ^ string_of_varexp v ^ "|"
+  | ListLength(e) -> "|" ^ string_of_expr e ^ "|"
   | GetType(e) -> "@(" ^ string_of_expr e ^ ")"
   | Append(e1, e2) -> string_of_expr e1 ^ " :: " ^ string_of_expr e2
   | Transfer(v, e) -> string_of_varexp v ^ " <- " ^ string_of_expr e

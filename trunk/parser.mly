@@ -155,7 +155,7 @@ expr:
       { Assign($1, Binop(Variable($1), Sub, IntLiteral(1))) }
   | var ASSIGN expr { Assign($1, $3) }
   | expr APPEND expr { Append($1, $3) }
-  | BAR var BAR { ListLength($2) }
+  | BAR expr BAR { ListLength($2) }
   | var TRANSFER expr { Transfer($1, $3) }
   | LBRACK list_opt RBRACK { ListLiteral($2) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
