@@ -416,7 +416,7 @@ in
 (* TODO initialize entities by reading from CardEntities block *)
 let listLiteralNull = [Null] in 
 let entities = List.fold_left
-  (fun entities vdecl -> NameMap.add vdecl listLiteralNull entities)
+  (fun entities vdecl -> NameMap.add vdecl Null entities)
   NameMap.empty spec.cent.entities
 in
 (* TODO initialize the cards symbol table to point to some generic owner (the deck?) *)
