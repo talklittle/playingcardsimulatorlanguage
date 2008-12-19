@@ -322,10 +322,10 @@ let run (program) =
           BoolLiteral(b) -> b
           | _ -> raise (Failure ("Invalid conditional expression.")))
         in
-        if b then begin
-          ignore (List.iter (fun n -> ignore(exec env n)) s1);  env end
-        else begin
-          ignore (List.iter (fun n -> ignore(exec env n)) s2);  env end    
+        if b then
+          List.fold_left exec env (List.rev s1)
+        else 
+          List.fold_left exec env (List.rev s2)   
     | While (e, s) ->
         let rec loop env =
           let v, env = eval env e in
@@ -333,8 +333,8 @@ let run (program) =
           BoolLiteral(b) -> b
           | _ -> raise (Failure ("Invalid conditional expression.")))
           in
-          if b then begin
-          ignore (List.iter ((*Add Break; functionality here *) fun n -> ignore(exec env n)) s); loop env end 
+          if b then
+            loop (List.fold_left exec env (List.rev s))
           else env
         in loop env
     | Break ->
@@ -347,7 +347,7 @@ let run (program) =
             let str = (match v with
           BoolLiteral(b) -> string_of_bool b
           |IntLiteral(i) -> string_of_int i
-          |CardLiteral(c) -> "Ace of Hearts"
+          |CardLiteral(c) -> "[Card: " ^ c 
           |StringLiteral(s) -> s
           | _ -> raise (Failure ("Invalid print expression.")))
           in
@@ -428,7 +428,7 @@ try
         let w = call (NameMap.find "WinningCondition" func_decls) [] globals entities cards
         in
         loop a
-      in loop
+      in loop "blah"
   end
   with Not_found ->
   raise (Failure ("did not find the start() function"))
