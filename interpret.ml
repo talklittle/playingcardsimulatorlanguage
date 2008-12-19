@@ -388,19 +388,24 @@ let run (program) =
 
 (* run: set global variables to Null; find and run "start" *)
 in
-(* TODO instead of setting global vars to Null, read them from the globals block *)
+(* initialize globals by reading from the globals block *)
 let globals = List.fold_left
   (fun globals vdecl -> NameMap.add vdecl Null globals)
   NameMap.empty spec.glob.globals
 in
-(* TODO initialize entities by reading from CardEntities block *)
+(* initialize entities by reading from CardEntities block *)
 let entities = List.fold_left
-  (fun entities vdecl -> NameMap.add vdecl Null entities)
+  (fun entities vdecl -> NameMap.add vdecl (ListLiteral([])) entities)
   NameMap.empty spec.cent.entities
 in
-(* TODO initialize the cards symbol table to point to some generic owner (the deck?) *)
+(* initialize the cards symbol table to point to the first CardEntity *)
+let firstentity =
+  (match spec.cent.entities with
+    hd :: _ -> hd
+  | []      -> raise (Failure ("You must declare at least one CardEntity.")))
+in
 let cards = List.fold_left
-  (fun cards vdecl -> NameMap.add vdecl Null cards)
+  (fun cards vdecl -> NameMap.add vdecl (StringLiteral(firstentity)) cards)
   NameMap.empty ["H2";"H3";"H4"]
 in
 try
