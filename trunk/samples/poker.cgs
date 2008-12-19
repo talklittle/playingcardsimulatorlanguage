@@ -2,7 +2,7 @@
 
 Include
 {
-	stdlib/stdlib.cgl;
+	"stdlib/stdlib.cgl";
 }
 
 CardEntities 

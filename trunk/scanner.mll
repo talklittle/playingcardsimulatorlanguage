@@ -123,8 +123,6 @@ rule token = parse
     lxm { ID(lxm) }
 | '\"'[^ '\"']*'\"' as 
     lxm { STRINGLITERAL(String.sub lxm 1 ((String.length lxm) - 2)) }
-| ['a'-'z' 'A'-'Z' '0'-'9' '_' '.' '/']+ as
-    lxm { FILE(lxm) }
 | eof { EOF }
 | _ as 
     char { raise (Failure("illegal character " ^ Char.escaped char)) }
