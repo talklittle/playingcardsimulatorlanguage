@@ -299,7 +299,7 @@ let run (vars, funcs) =
         in
         let (locals, globals, entities, cards) = env in
         try
-          let globals = call fdecl actuals globals entities cards
+          let globals, entities, cards = call fdecl actuals globals entities cards
           in  BoolLiteral(false), (locals, globals, entities, cards)
         with ReturnException(v, globals, entities, cards) -> v, (locals, globals, entities, cards)
   in
@@ -351,7 +351,7 @@ let run (vars, funcs) =
     locals fdecl.locals
   in   (* Execute each statement; return updated global symbol table *)
   (match (List.fold_left exec (locals, globals, entities, cards) fdecl.body) with
-    _, globals, _, _ -> globals)
+    _, globals, entities, cards -> globals, entities, cards)
 
 (* run: set global variables to Null; find and run "start" *)
 in
