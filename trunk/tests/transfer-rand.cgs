@@ -69,6 +69,18 @@ Start
 
 		i++;
         }
+
+	i = 0;
+	<< "What's left in the deck?";
+	if (|$deck| == 0) {
+		<< "Nothing! Cool!";
+	} else {
+		while (i < |$deck|) {
+			<< $deck[i];
+	
+			i++;
+        	}
+	}
 }
 
 Play 

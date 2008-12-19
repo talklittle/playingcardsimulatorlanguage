@@ -480,15 +480,28 @@ try
             let (globals, entities, cards) = 
                 call (NameMap.find "WinningCondition" func_decls) [] globals entities cards
             in (globals, entities, cards)
-        with ReturnException(v, globals, entities, cards) -> v, (globals, entities, cards)
-        in
-        if (v == null || v == []) then
-            loop a (globals, entities, cards)
-        else
-            raise (GameOverException (v))*)
+        with ReturnException(v, globals, entities, cards) ->
+          (match v with
+            Null -> loop a (globals, entities, cards)
+          | _ -> raise (GameOverException (v)))
             
       in loop "blah" (globals, entities, cards)
   
-  with Not_found ->
-  raise (Failure ("did not find the vital programming block"))
- 
+  with 
+    Not_found -> raise (Failure ("did not find the start() function"))
+  | GameOverException(winners) ->
+      print_endline "Game over!"; exit 0
+      (*
+      (match winners with
+        StringLiteral(singlewinner) ->
+          print_endline ("Game over! The winner is ~*~*~ "^singlewinner^" ~*~*~");
+          0
+      | ListLiteral(multiwinners) ->
+          List.fold_left
+            (fun _ awinner ->
+              (match awinner with
+                StringLiteral(winner) -> FIXME
+                print_endline ("Congratulations "^awinner^"!"))
+            () multiwinners
+      | _ -> raise (Failure ("internal error: GameOverException raised with bad arguments")))
+      *)
