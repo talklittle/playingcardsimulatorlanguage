@@ -42,7 +42,7 @@ and expr =
   | Assign of varexp * expr (* Assignment of an expression to a variable *)
   | Append of expr * expr (* Appending to a list variable *)
   | GetType of expr (* Returns the string description of the type of expr *)
-  | ListLength of expr (* Should evaluate to the length of a list *)
+  | ListLength of varexp (* Should evaluate to the length of a list *)
   | Transfer of varexp * expr (* The transfer operator, e.g $player1 <- H1. *)
                               (* The interpreter needs to check that the lhs *)
                               (* evaluates to CardEntity and rhs evaluates *)
