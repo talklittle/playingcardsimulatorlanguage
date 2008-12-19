@@ -106,18 +106,25 @@ play(var e)
 	var i;
 	var bid;
 
-	
+	bid =5;
 	<<"Player going: ";
 	<<e;
 	//i = indexOf(#players, e);
-	//#doneBidding[i] = false;
+	#doneBidding[0] = false;
+	#doneBidding[1] = false;
 	//<< "" ^ e; // print the cards of this card entity
 	i =0;
 	while (i<5)
 	{
+		i=i+1;
 		<<e[i];
 	}
-	
+	if ( bid == null) {
+	<<"bid ok";
+	}
+	<<bid;
+	bid < #lastBid;
+	<<"bid 2 ok";
 	if (bid == null || bid < #lastBid) // haven't bet or overbet
 	{
 	   >> bid; // input a bet (auto convert input to type of 'bid')

@@ -69,6 +69,23 @@ let run (program) =
         | StringLiteral(i1), Neq, StringLiteral(i2) -> boolean (i1 <> i2)
         | CardLiteral(i1),   Neq, CardLiteral(i2)   -> boolean (i1 <> i2)
         | BoolLiteral(i1),   Neq, BoolLiteral(i2)   -> boolean (string_of_bool i1 <> string_of_bool i2)
+        | Null,    Equal, Null    -> boolean(true)
+        | IntLiteral(i1),    Equal, Null    -> boolean(false)
+        | StringLiteral(i1), Equal, Null -> boolean(false)
+        | CardLiteral(i1),   Equal, Null   -> boolean(false)
+        | BoolLiteral(i1),   Equal, Null   -> boolean(false)
+        | IntLiteral(i1),    Neq, Null    -> boolean(false)
+        | StringLiteral(i1), Neq, Null -> boolean(false)
+        | CardLiteral(i1),   Neq, Null   -> boolean(false)
+        | BoolLiteral(i1),   Neq, Null   -> boolean(false)
+        | Null,    Equal, IntLiteral(i2)    -> boolean(false)
+        | Null, Equal, StringLiteral(i2) -> boolean(false)
+        | Null,   Equal, CardLiteral(i2)   -> boolean(false)
+        | Null,   Equal, BoolLiteral(i2)   -> boolean(false)
+        | Null,    Neq, IntLiteral(i2)    -> boolean(false)
+        | Null, Neq, StringLiteral(i2) -> boolean(false)
+        | Null,   Neq, CardLiteral(i2)   -> boolean(false)
+        | Null,   Neq, BoolLiteral(i2)   -> boolean(false)
         | IntLiteral(i1),    Less, IntLiteral(i2)    -> boolean (i1 < i2)
         | StringLiteral(i1), Less, StringLiteral(i2) -> boolean (i1 < i2)
         | CardLiteral(i1),   Less, CardLiteral(i2)   -> boolean (i1 < i2) (* cmp cards as string? *)
@@ -85,9 +102,12 @@ let run (program) =
         | BoolLiteral(i1), Or, BoolLiteral(i2)  -> boolean (i1 || i2)
 
         | StringLiteral(i1), Concat, StringLiteral(i2) -> StringLiteral(i1 ^ i2)  (* we want String concat, right? *)
+        | StringLiteral(i1), Concat, StringLiteral(i2) -> StringLiteral(i1 ^ i2)  (* we want String concat, right? *)
+        | StringLiteral(i1), Concat, StringLiteral(i2) -> StringLiteral(i1 ^ i2)  (* we want String concat, right? *)
+        | StringLiteral(i1), Concat, StringLiteral(i2) -> StringLiteral(i1 ^ i2)  (* we want String concat, right? *)
 
         | _, _, _ ->
-            raise (Failure ("invalid binary operation"))
+            raise (Failure ("invalid binary operation - likely comparing two incompatible types"))
         ), env
 
     | Rand(e) ->
