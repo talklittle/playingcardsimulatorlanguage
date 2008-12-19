@@ -293,7 +293,8 @@ let run (spec, funcs) =
     | Call(f, actuals) ->
         let fdecl =
           try NameMap.find f func_decls
-          with Not_found -> raise (Failure ("undefined function " ^ f))
+          with Not_found ->
+          raise (Failure ("undefined function " ^ f))
         in
         let actuals, env = List.fold_left
             (fun (actuals, values) actual ->
@@ -328,7 +329,7 @@ let run (spec, funcs) =
           | _ -> raise (Failure ("Invalid conditional expression.")))
           in
           if b then begin
-          ignore (List.iter (fun n -> ignore(exec env n)) s); loop env end 
+          ignore (List.iter ((*Add Break; functionality here *) fun n -> ignore(exec env n)) s); loop env end 
           else env
         in loop env
     | Break ->
@@ -367,20 +368,33 @@ in
 (* TODO instead of setting global vars to Null, read them from the globals block *)
 let globals = List.fold_left
   (fun globals vdecl -> NameMap.add vdecl Null globals)
-  NameMap.empty vars
+  NameMap.empty spec.glob.globals
 in
 (* TODO initialize entities by reading from CardEntities block *)
 let entities = List.fold_left
   (fun entities vdecl -> NameMap.add vdecl Null entities)
-  NameMap.empty vars
+  NameMap.empty spec.cent.entities
 in
 (* TODO initialize the cards symbol table to point to some generic owner (the deck?) *)
 let cards = List.fold_left
   (fun cards vdecl -> NameMap.add vdecl Null cards)
-  NameMap.empty vars
+  NameMap.empty []
 in
+(*let globals = Null, NameMap.empty
+in 
+let entities = Null, NameMap.empty
+in 
+let cards = Null, NameMap.empty
+in*)
 try
   (* XXX should actuals be command line args instead of [] ? *)
-  call (NameMap.find "start" func_decls) [] globals entities cards
+  let startDecl = { fname = "Start";
+                formals = []; 
+                locals = spec.strt.slocals; 
+                body=spec.strt.sbody } 
+  in
+  let func_decls = NameMap.add "Start" startDecl func_decls
+  in
+  call (NameMap.find "Start" func_decls) [] globals entities cards
 with Not_found ->
   raise (Failure ("did not find the start() function"))
