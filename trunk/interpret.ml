@@ -90,7 +90,8 @@ let run (program) =
         ), env
 
     | Rand(e) ->
-        (match e with
+        let v, env = eval env e in
+        (match v with
           IntLiteral(i) -> IntLiteral(Random.int i), env
         | _ -> raise (Failure ("invalid argument for random operator ~. Must supply an int."))
         )
@@ -341,7 +342,18 @@ let run (program) =
     | Read(var) ->
         env (* TODO *)
     | Print(e) ->
-        env (* TODO *)
+        let v, env = eval env e in
+        begin
+            let str = (match v with
+          BoolLiteral(b) -> string_of_bool b
+          |IntLiteral(i) -> string_of_int i
+          |CardLiteral(c) -> "Ace of Hearts"
+          |StringLiteral(s) -> s
+          | _ -> raise (Failure ("Invalid print expression.")))
+          in
+            print_endline str;
+            env (* TODO *)
+        end
     | Return(e) ->
         let v, (locals, globals, entities, cards) = eval env e in
         raise (ReturnException(v, globals, entities, cards))
@@ -384,12 +396,6 @@ let cards = List.fold_left
   (fun cards vdecl -> NameMap.add vdecl Null cards)
   NameMap.empty []
 in
-(*let globals = Null, NameMap.empty
-in 
-let entities = Null, NameMap.empty
-in 
-let cards = Null, NameMap.empty
-in*)
 try
   (* XXX should actuals be command line args instead of [] ? *)
   let startDecl = { fname = "Start";
