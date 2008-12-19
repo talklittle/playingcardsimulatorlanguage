@@ -100,14 +100,18 @@ let run (program) =
         | CardLiteral(i1),   Geq, CardLiteral(i2)   -> boolean (i1 >= i2) (* cmp cards as string? *)
         | BoolLiteral(i1), And, BoolLiteral(i2) -> boolean (i1 && i2)
         | BoolLiteral(i1), Or, BoolLiteral(i2)  -> boolean (i1 || i2)
-
         | StringLiteral(i1), Concat, StringLiteral(i2) -> StringLiteral(i1 ^ i2)  (* we want String concat, right? *)
-        | StringLiteral(i1), Concat, StringLiteral(i2) -> StringLiteral(i1 ^ i2)  (* we want String concat, right? *)
-        | StringLiteral(i1), Concat, StringLiteral(i2) -> StringLiteral(i1 ^ i2)  (* we want String concat, right? *)
-        | StringLiteral(i1), Concat, StringLiteral(i2) -> StringLiteral(i1 ^ i2)  (* we want String concat, right? *)
-
+        | StringLiteral(i1), Concat, CardLiteral(i2) -> StringLiteral(i1 ^ i2)  (* we want String concat, right? *)
+        | StringLiteral(i1), Concat, Variable(VarExp(id, Entity)) -> StringLiteral(i1 ^ id)  (* we want String concat, right? *)
+        | StringLiteral(i1), Concat, IntLiteral(i2) -> StringLiteral(i1 ^ string_of_int i2)  (* we want String concat, right? *)
+        | StringLiteral(i1), Concat, BoolLiteral(i2) -> StringLiteral(i1 ^ string_of_bool i2)  (* we want String concat, right? *)
+        | CardLiteral(i1), Concat, StringLiteral(i2) -> StringLiteral(i1 ^ i2)  (* we want String concat, right? *)
+        | Variable(VarExp(id, Entity)), Concat, StringLiteral(i2) -> StringLiteral(id ^ i2)  (* we want String concat, right? *)
+        | IntLiteral(i1), Concat, StringLiteral(i2) -> StringLiteral(string_of_int i1 ^  i2)  (* we want String concat, right? *)
+        | BoolLiteral(i1), Concat, StringLiteral(i2) -> StringLiteral(string_of_bool i1 ^  i2)  (* we want String concat, right? *)
+       
         | _, _, _ ->
-            raise (Failure ("invalid binary operation - likely comparing two incompatible types"))
+                    raise (Failure ("invalid binary operation - likely comparing two incompatible types"))
         ), env
 
     | Rand(e) ->
