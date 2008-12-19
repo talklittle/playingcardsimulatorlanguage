@@ -24,7 +24,7 @@ Start
 	i = 0;
 
 	while (i < 52) {
-		r = ~1;
+		r = ~2;
 		<< r;
 		if (r == 0) {
 			$player1 <- $deck[0];
