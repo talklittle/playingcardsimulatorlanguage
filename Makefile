@@ -1,4 +1,5 @@
 OBJS = parser.cmo scanner.cmo printer.cmo interpret.cmo pcgsl.cmo
+LIBS = unix.cma
 
 TESTS = \
 arith1 \
@@ -23,7 +24,7 @@ TARFILES = Makefile testall.sh scanner.mll parser.mly \
 	$(TESTS:%=tests/test-%.out)
 
 pcgsl : $(OBJS)
-	ocamlc -o pcgsl $(OBJS)
+	ocamlc -o pcgsl $(LIBS) $(OBJS)
 
 .PHONY : test
 test : pcgsl testall.sh

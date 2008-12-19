@@ -21,11 +21,15 @@ Start
 	var i;
 	var r;
 
+	// test out variables holding CardEntity reference
+	var p2;
+	p2 = $player2;
+
 	i = 0;
 
 	while (i < 26) {
 		$player1 <- $deck[0];
-		$player2 <- $deck[0];
+		p2 <- $deck[0];
 		i++;
 	}
 
@@ -41,8 +45,8 @@ Start
 
 	i = 0;
 	<< "player 2:";
-	while (i < |$player2|) {
-		<< $player2[i];
+	while (i < |p2|) {
+		<< p2[i];
 
 		i++;
         }

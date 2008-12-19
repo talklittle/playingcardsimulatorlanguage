@@ -10,8 +10,8 @@ exception ReturnException of Ast.expr * Ast.expr NameMap.t * Ast.expr NameMap.t 
 (* return: string or string list of winners, or [] for no winners *)
 exception GameOverException of Ast.expr
 
-(* seed random number generator with The Answer *)
-let _ = Random.init (42)
+(* seed random number generator with current time *)
+let _ = Random.init (truncate (Unix.time()))
 let entityData = []
 
 (* Main entry point: run a program *)
@@ -317,6 +317,16 @@ let run (program) =
               | _ -> raise (Failure ("internal error: Card "^id^" not mapped to a StringLiteral")))
 
             else raise (Failure ("Invalid card name: " ^ c))
+        | VarExp(id, _), CardLiteral(c) ->
+            let ceref, env = eval env (Variable(cevar)) in
+            (match ceref with
+              Variable(VarExp(id2, Entity)) -> eval env (Transfer(VarExp(id2, Entity), evalc))
+            | _ -> raise (Failure ("Transfer: arguments must be cardentity <- card")))
+        | GetIndex(id, _, _), CardLiteral(c) ->
+            let ceref, env = eval env (Variable(cevar)) in
+            (match ceref with
+              Variable(VarExp(id2, Entity)) -> eval env (Transfer(VarExp(id2, Entity), evalc))
+            | _ -> raise (Failure ("Transfer: arguments must be cardentity <- card")))
         | _, _ -> raise (Failure ("Transfer: arguments must be cardentity <- card")))
 
     | Call(f, actuals) ->
