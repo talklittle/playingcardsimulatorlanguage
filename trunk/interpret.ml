@@ -7,8 +7,8 @@ end)
 
 exception ReturnException of Ast.expr * Ast.expr NameMap.t * Ast.expr NameMap.t * Ast.expr NameMap.t
 
-(* seed random number generator with current time *)
-let _ = Random.init (truncate (Unix.time ()))
+(* seed random number generator with The Answer *)
+let _ = Random.init (42)
 
 (* Main entry point: run a program *)
 
@@ -183,10 +183,14 @@ let run (vars, funcs) =
               Local, IntLiteral(i) ->
                 if NameMap.mem id locals then
                   let rec inserthelper ls targetindex value curr =
-                    (match ls, curr with
-                      _ :: tl, targetindex  -> value :: tl
-                    | [], _                 -> raise (Failure ("index out of bounds"))
-                    | hd :: tl, _           -> hd :: (inserthelper tl targetindex value (curr+1)))
+                    if curr = targetindex then
+                      (match ls with
+                      | []      -> [value]
+                      | _ :: tl -> value :: tl)
+                    else
+                      (match ls with
+                      | []       -> raise (Failure ("index out of bounds"))
+                      | hd :: tl -> hd :: (inserthelper tl targetindex value (curr+1)))
                   in
                   (match NameMap.find id locals with
                     ListLiteral(ls) ->
@@ -198,10 +202,14 @@ let run (vars, funcs) =
             | Global, IntLiteral(i) ->
                 if NameMap.mem id globals then
                   let rec inserthelper ls targetindex value curr =
-                    (match ls, curr with
-                      _ :: tl, targetindex  -> value :: tl
-                    | [], _                 -> raise (Failure ("index out of bounds"))
-                    | hd :: tl, _           -> hd :: (inserthelper tl targetindex value (curr+1)))
+                    if curr = targetindex then
+                      (match ls with
+                      | []      -> [value]
+                      | _ :: tl -> value :: tl)
+                    else
+                      (match ls with
+                      | []       -> raise (Failure ("index out of bounds"))
+                      | hd :: tl -> hd :: (inserthelper tl targetindex value (curr+1)))
                   in
                   (match NameMap.find id globals with
                     ListLiteral(ls) ->
@@ -238,9 +246,8 @@ let run (vars, funcs) =
               (* delete Card from original CardEntity's list *)
               let rec deletehelper ls value =
                 (match ls with
-                  []           -> []
-                | value :: tl  -> tl
-                | hd :: tl      -> hd :: (deletehelper tl value))
+                  []       -> []
+                | hd :: tl -> if hd = value then tl else hd :: (deletehelper tl value))
               in
               let oldownerlit = NameMap.find c cards in
               (match oldownerlit with
@@ -258,8 +265,7 @@ let run (vars, funcs) =
                   let rec insertunique ls value =
                     (match ls with
                       []           -> [value]
-                    | value :: tl  -> ls
-                    | hd :: tl     -> hd :: (insertunique tl value))
+                    | hd :: tl     -> if hd = value then ls else hd :: (insertunique tl value))
                   in
                   (* add updated ListLiteral to new entity's list *)
                   if NameMap.mem id entities then
@@ -344,14 +350,24 @@ let run (vars, funcs) =
     (fun locals local -> NameMap.add local Null locals)
     locals fdecl.locals
   in   (* Execute each statement; return updated global symbol table *)
-  snd (List.fold_left exec (locals, globals, entities, cards) fdecl.body)
+  (match (List.fold_left exec (locals, globals, entities, cards) fdecl.body) with
+    _, globals, _, _ -> globals)
 
 (* run: set global variables to Null; find and run "start" *)
-(* TODO instead of setting global vars to Null, read them from the globals block *)
-(* TODO initialize the cards symbol table to point to some generic owner (the deck?) *)
 in
+(* TODO instead of setting global vars to Null, read them from the globals block *)
 let globals = List.fold_left
   (fun globals vdecl -> NameMap.add vdecl Null globals)
+  NameMap.empty vars
+in
+(* TODO initialize entities by reading from CardEntities block *)
+let entities = List.fold_left
+  (fun entities vdecl -> NameMap.add vdecl Null entities)
+  NameMap.empty vars
+in
+(* TODO initialize the cards symbol table to point to some generic owner (the deck?) *)
+let cards = List.fold_left
+  (fun cards vdecl -> NameMap.add vdecl Null cards)
   NameMap.empty vars
 in
 try
