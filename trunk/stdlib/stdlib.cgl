@@ -5,23 +5,23 @@
 // *******************************
 
 //
-// stringtoint - returns the int representation of the given string, up to the
-//               given integer limit. Or null, if no int representation found.
+// stringtoint - returns the int representation of the given string, within the
+//               given integer limits. Or null, if no int representation found.
 //
-// input type(s) expected: string, int
+// input type(s) expected: string, int, int
 // output type(s): int
 //
-stringtoint(var s, var i) {
+stringtoint(var s, var low, var high) {
   var j;
   
-  if (@s != "string" || @i != "int") {
+  if (@s != "string" || @low != "int" || @high != "int") {
     return null;
   }
 
-  j = 0;
+  j = low;
 
   while (true) {
-    if (j > i) {
+    if (j > high) {
       return null;
     }
     if ("" ^ j == s) {
@@ -38,7 +38,7 @@ stringtoint(var s, var i) {
 // input type(s) expected: string
 // output type(s): Card
 //
-stringtoint(var s) {
+stringtocard(var s) {
   var cards;
   
   if (@s != "string") {
@@ -154,6 +154,95 @@ listreverse(var oldl) {
 // ************************************
 // Functions for Cards and CardEntities
 // ************************************
+
+//
+// cardsuit - returns the suit value of the given Card as an int. Heart is 1,
+//            Diamond is 2, Club is 3, and Spade is 4.
+//
+// input type(s) expected: Card
+// output type(s): int
+//
+cardsuit(var c) {
+  if (@c != "Card") {
+    return null;
+  }
+
+  if (c == H2 || c == H3 || c == H4 || c == H5 || c == H6 ||
+      c == H7 || c == H8 || c == H9 || c == H10 || c == HJ || 
+      c == HQ || c == HK || c == HA) {
+    return 1;
+  }
+
+  if (c == D2 || c == D3 || c == D4 || c == D5 || c == D6 ||
+      c == D7 || c == D8 || c == D9 || c == D10 || c == DJ || 
+      c == DQ || c == DK || c == DA) {
+    return 2;
+  }
+
+  if (c == C2 || c == C3 || c == C4 || c == C5 || c == C6 ||
+      c == C7 || c == C8 || c == C9 || c == C10 || c == CJ || 
+      c == CQ || c == CK || c == CA) {
+    return 3;
+  }
+
+  if (c == S2 || c == S3 || c == S4 || c == S5 || c == S6 ||
+      c == S7 || c == S8 || c == S9 || c == S10 || c == SJ || 
+      c == SQ || c == SK || c == SA) {
+    return 4;
+  }
+}
+
+//
+// cardface - returns the face value of the given Card as an int. Ace is 1.
+//
+// input type(s) expected: Card
+// output type(s): int
+//
+cardface(var c) {
+  if (@c != "Card") {
+    return null;
+  }
+
+  if (c == H2 || c == D2 || c == C2 || c = S2) {
+    return 2;
+  }
+  if (c == H3 || c == D3 || c == C3 || c = S3) {
+    return 3;
+  }
+  if (c == H4 || c == D4 || c == C4 || c = S4) {
+    return 4;
+  }
+  if (c == H5 || c == D5 || c == C5 || c = S5) {
+    return 5;
+  }
+  if (c == H6 || c == D6 || c == C6 || c = S6) {
+    return 6;
+  }
+  if (c == H7 || c == D7 || c == C7 || c = S7) {
+    return 7;
+  }
+  if (c == H8 || c == D8 || c == C8 || c = S8) {
+    return 8;
+  }
+  if (c == H9 || c == D9 || c == C9 || c = S9) {
+    return 9;
+  }
+  if (c == H10 || c == D10 || c == C10 || c = S10) {
+    return 10;
+  }
+  if (c == HJ || c == DJ || c == CJ || c = SJ) {
+    return 11;
+  }
+  if (c == HQ || c == DQ || c == CQ || c = SQ) {
+    return 12;
+  }
+  if (c == HK || c == DK || c == CK || c = SK) {
+    return 13;
+  }
+  if (c == HA || c == DA || c == CA || c = SA) {
+    return 1;
+  }
+}
 
 //
 // listallcards - returns a list containing all Cards.
