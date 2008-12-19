@@ -11,7 +11,7 @@ exception ReturnException of Ast.expr * Ast.expr NameMap.t * Ast.expr NameMap.t 
 exception GameOverException of Ast.expr
 
 (* seed random number generator with current time *)
-let _ = Random.init (truncate (Unix.time()))
+let _ = Random.init (truncate (42.0)) (* FIX ME *)
 let entityData = []
 
 (* Main entry point: run a program *)
@@ -472,12 +472,20 @@ try
       let rec loop a (globals, entities, cards) =
         let (globals, entities, cards) = 
             call (NameMap.find "Play" func_decls) [] globals entities cards
+        in        
+        try
+            let (globals, entities, cards) = 
+                call (NameMap.find "WinningCondition" func_decls) [] globals entities cards
+            in (globals, entities, cards)
+        with ReturnException(v, globals, entities, cards) -> v, (globals, entities, cards)
         in
-        let (globals, entities, cards) = call (NameMap.find "WinningCondition" func_decls) [] globals entities cards
-        in
-        loop a (globals, entities, cards)
+        if (v == null || v == []) then
+            loop a (globals, entities, cards)
+        else
+            raise (GameOverException (v))
+            
       in loop "blah" (globals, entities, cards)
   
   with Not_found ->
-  raise (Failure ("did not find the start() function"))
+  raise (Failure ("did not find the vital programming block"))
  
