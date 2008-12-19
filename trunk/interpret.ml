@@ -12,6 +12,7 @@ exception GameOverException of Ast.expr
 
 (* seed random number generator with The Answer *)
 let _ = Random.init (42)
+let entityData = []
 
 (* Main entry point: run a program *)
 
@@ -233,16 +234,35 @@ let run (program) =
             ))
 
     | ListLength(vlist) ->
-         let evlist, env = eval env vlist in 
-        (match evlist with
-          ListLiteral(ls) -> IntLiteral(List.length ls), env
-        | VarExp(id, Entity) ->
-             if NameMap.mem id entities then
-                                  (match NameMap.find id entities with
-                                    ListLiteral(ls) -> IntLiteral(List.length ls), env
-                                    | _ -> raise (Failure ("internal error: CardEntity "^id^" not storing ListLiteral"))), env
-                                else raise (Failure ("undeclared CardEntity " ^ id))
-        | _ -> raise (Failure ("argument to list length operator must be a list or Card Entity")))
+         (*let evlist, env = eval env vlist in *)
+        let locals, globals, entities, cards = env in
+        (match vlist with
+          (*ListLiteral(ls) -> IntLiteral(List.length ls), env*)
+          VarExp(id, scope) ->
+            (match scope with
+              Local ->
+                (* NameMap maps var name to (literalvalue) *)
+                if NameMap.mem id locals then
+                  (match NameMap.find id locals, env with
+                    ListLiteral(ls), env -> IntLiteral(List.length ls), env
+                    | _ -> raise (Failure ("variable is not a list " ^ id))
+                    )
+                else raise (Failure ("undeclared local variable " ^ id))
+            | Global ->
+                if NameMap.mem id globals then
+                  (match NameMap.find id locals, env with
+                    ListLiteral(ls), env -> IntLiteral(List.length ls), env
+                    | _ -> raise (Failure ("variable is not a list " ^ id))
+                    )
+                else raise (Failure ("undeclared global variable " ^ id))
+            | Entity ->
+                if NameMap.mem id entities then
+                  (match NameMap.find id entities with
+                    ListLiteral(ls) -> IntLiteral(List.length ls)
+                    | _ -> raise (Failure ("internal error: CardEntity "^id^" not storing ListLiteral"))), env
+                else raise (Failure ("undeclared CardEntity " ^ id))
+            )          
+           | _ -> raise (Failure ("argument to list length operator must be a list or Card Entity variable - value lists are not permitted")))
 
     | Append(vlist, e) ->
         let v, env = eval env e in
@@ -394,14 +414,15 @@ let globals = List.fold_left
   NameMap.empty spec.glob.globals
 in
 (* TODO initialize entities by reading from CardEntities block *)
+let listLiteralNull = [Null] in 
 let entities = List.fold_left
-  (fun entities vdecl -> NameMap.add vdecl Null entities)
+  (fun entities vdecl -> NameMap.add vdecl listLiteralNull entities)
   NameMap.empty spec.cent.entities
 in
 (* TODO initialize the cards symbol table to point to some generic owner (the deck?) *)
 let cards = List.fold_left
   (fun cards vdecl -> NameMap.add vdecl Null cards)
-  NameMap.empty []
+  NameMap.empty ["H2";"H3";"H4"]
 in
 try
   (* XXX should actuals be command line args instead of [] ? *)
@@ -429,14 +450,14 @@ try
   let (globals, entities, cards) =
     call (NameMap.find "Start" func_decls) [] globals entities cards
     in
-      let rec loop a =
+      let rec loop a (globals, entities, cards) =
         let (globals, entities, cards) = 
             call (NameMap.find "Play" func_decls) [] globals entities cards
         in
         let (globals, entities, cards) = call (NameMap.find "WinningCondition" func_decls) [] globals entities cards
         in
-        loop a
-      in loop "blah"
+        loop a (globals, entities, cards)
+      in loop "blah" (globals, entities, cards)
   
   with Not_found ->
   raise (Failure ("did not find the start() function"))
