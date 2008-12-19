@@ -30,8 +30,7 @@ Start // Deal cards, set chips
 
 	<<"Shuffling deck";
 	shuffle($dealer);
-	<<#players[0];
-	<<"Dealing Cards " ^ #players[0];
+	<<"Dealing Cards";
 	i = 0;
 	while (i < |#players|) {
 	      e = #players[i];	      
@@ -45,7 +44,7 @@ Start // Deal cards, set chips
 
 	      // Print out the player's hand.
 	      << "Player " ^ i ^ " hand: " ^ e[0] ^ " " ^ e[1] ^ " " ^ e[2] 
-	      	 ^ " " ^ e[3] ^ " " ^ e[4] ^ "\n";
+	      	 ^ " " ^ e[3] ^ " " ^ e[4];
 
 	      i++;
         }
@@ -66,13 +65,13 @@ WinCondition
 	var card4;
 	
 	card1 = high_card($player0);
-	<< "Player 1 high card : " ^ card1 ^ "\n";
+	<< "Player 0 high card : " ^ card1;
 	card2 = high_card($player1);
-	<< "Player 2 high card : " ^ card2 ^ "\n";
+	<< "Player 1 high card : " ^ card2;
 	card3 = high_card($player2);
-	<< "Player 3 high card : " ^ card3 ^ "\n";
+	<< "Player 2 high card : " ^ card3;
 	card4 = high_card($player3);
-	<< "Player 4 high card : " ^ card4 ^ "\n";
+	<< "Player 3 high card : " ^ card4;
 
 	comp = card_compare(card1, card2);
 	if (comp > 0) {
@@ -93,6 +92,7 @@ WinCondition
 	   highcard = card4;
 	}
 
+	<< "The winner is: " ^ highplayer;
 	return [highplayer];
 }
 
