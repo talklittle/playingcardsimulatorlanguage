@@ -233,10 +233,16 @@ let run (program) =
             ))
 
     | ListLength(vlist) ->
-        let evlist, env = eval env vlist in
+         let evlist, env = eval env vlist in 
         (match evlist with
           ListLiteral(ls) -> IntLiteral(List.length ls), env
-        | _ -> raise (Failure ("argument to list length operator must be a list")))
+        | VarExp(id, Entity) ->
+             if NameMap.mem id entities then
+                                  (match NameMap.find id entities with
+                                    ListLiteral(ls) -> IntLiteral(List.length ls), env
+                                    | _ -> raise (Failure ("internal error: CardEntity "^id^" not storing ListLiteral"))), env
+                                else raise (Failure ("undeclared CardEntity " ^ id))
+        | _ -> raise (Failure ("argument to list length operator must be a list or Card Entity")))
 
     | Append(vlist, e) ->
         let v, env = eval env e in
