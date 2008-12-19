@@ -1,0 +1,36 @@
+// A program that implements a very simple simulation of Poker for 4 players.
+
+Include
+{
+	"stdlib/stdlib.cgl";
+}
+
+CardEntities 
+{
+	deck;
+}
+
+Globals
+{
+}
+
+Start
+{
+	var i;
+
+	i = 0;
+	while (i < |$deck|) {
+	      << $deck[i];
+
+	      i++;
+        }
+}
+
+Play 
+{
+}
+
+WinCondition 
+{
+	return [];
+}
