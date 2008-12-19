@@ -473,10 +473,7 @@ try
         let (globals, entities, cards) = 
             call (NameMap.find "Play" func_decls) [] globals entities cards
         in  
-        let (globals, entities, cards) = 
-                call (NameMap.find "WinningCondition" func_decls) [] globals entities cards
-        in loop a   (globals, entities, cards)    
-        (*try
+        try
             let (globals, entities, cards) = 
                 call (NameMap.find "WinningCondition" func_decls) [] globals entities cards
             in (globals, entities, cards)
