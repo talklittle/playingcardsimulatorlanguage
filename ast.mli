@@ -18,10 +18,6 @@ type t =
   | CardEntity (* "CardEntity" reference type *)
   | ListType (* "list" type. elements of a list can be expressions. *)
 
-(* Variable declaration, contains the id of of the variable *)
-type vardec = 
-    VarDec of string
-
 (* Variable used in an expression, contains the id and scope of the variable *)
 (* Also can be a "GetIndex", which is a list dereference with string being *)
 (* the list variable, and expr being the expression within the brackets. *)
@@ -80,8 +76,8 @@ type stmt =
 (* Standard function declaration *)
 type func_decl = {
     fname : string;
-    formals : vardec list;
-    locals : vardec list;
+    formals : string list;
+    locals : string list;
     body : stmt list;
   }
 
@@ -97,27 +93,27 @@ type cent_decl = {
 
 (* Global variable declaration, contains a list of variable declarations *)
 type glob_decl = {
-    globals : vardec list;
+    globals : string list;
   }
 
 (* Start declaration. Executed once at the beginning of the interpretation. *)
 (* Should be able to break out with "return" *)
 type strt_decl = {
-    slocals : vardec list;
+    slocals : string list;
     sbody : stmt list;
   }
 
 (* Play declaration. Executed indefinitely as long as WinCondition returns *)
 (* null. Should be able to break out with "return" *)
 type play_decl = {
-    plocals : vardec list;
+    plocals : string list;
     pbody : stmt list;
   }
 
 (* WinCondition declaration. Executed before each Play execution. Has a *)
 (* return type of List (containing CardEntities) *)
 type wcon_decl = {
-    wlocals : vardec list;
+    wlocals : string list;
     wbody : stmt list;
   }
 

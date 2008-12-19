@@ -33,7 +33,7 @@ let string_of_scope scope = match scope with
   | Entity  -> "$"
 
 let string_of_vardec v = match v with
-    VarDec(id) -> "var " ^ id
+    id -> "var " ^ id
 
 let rec string_of_varexp v = match v with
   | VarExp(id, s) -> string_of_scope s ^ id
