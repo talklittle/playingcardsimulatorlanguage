@@ -37,7 +37,7 @@ Start // Deal cards, set chips
 	#lastBid = 0;
 	#chips = [100, 100]; // start players off with 100 chips
 	#players = [$player0, $player1]; // have an array of players
-	#doneBidding = [false, false];
+	#doneBidding = [true, true];
 	#message = "Please select a card.";
 	
 	// test card and randomness
@@ -47,7 +47,6 @@ Start // Deal cards, set chips
 	c = D2;
 	i = ~1;
 	i = ~(5 + 4 / 3);
-	<< i;
 
 	// shuffle the deck
 	//shuffle($dealer);
@@ -65,21 +64,21 @@ Play
 {
 	var i;
 
+	<<"Calling Play Function";
 	//for (i = 0; i < size(#players); i++) {
 	//    play(#players[i]);
 	//}
 	i = 0;
 	while (i<5){
 		i = i+1;
-		
 		<< i;
-		<< "player is playing";
 	}
-	//while (#doneBidding[0] && #doneBidding[1]) {
-	//   play($player0);
-	//   play($player1);
-	//}
-
+	
+	   play($dealer);
+	while (#doneBidding[0] && #doneBidding[1]) {
+	   play($player0);
+	   play($player1);
+	}
 	//evaluateHandWinner();
 }
 
@@ -87,6 +86,7 @@ WinCondition
 // Condition for the game to end - evaluated after each round.
 // Must return a list of Card Entities (or null if no winner yet).
 {
+	<<"Checking Win Condition";
 	if (#chips[0] <= 0 && #chips[1] <= 0) {
 	   return [];
 	} else {
@@ -106,10 +106,17 @@ play(var e)
 	var i;
 	var bid;
 
-
-	i = indexOf(#players, e);
-	#doneBidding[i] = false;
-	<< "" ^ e; // print the cards of this card entity
+	
+	<<"Player going: ";
+	<<e;
+	//i = indexOf(#players, e);
+	//#doneBidding[i] = false;
+	//<< "" ^ e; // print the cards of this card entity
+	i =0;
+	while (i<|e|)
+	{
+		<<e[i];
+	}
 	
 	if (bid == null || bid < #lastBid) // haven't bet or overbet
 	{
@@ -131,3 +138,8 @@ evaluateHandWinner(var lc, var round)
 	return @1;
 }	
 
+testfunc()
+{
+
+return 0;
+}
