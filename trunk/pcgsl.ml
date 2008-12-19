@@ -1,4 +1,4 @@
-let print = true;;
+let print = false;;
 
 let filename = 
   if Array.length Sys.argv != 2
@@ -25,6 +25,6 @@ let _ =
   if print then 
     let listing = Printer.string_of_program program in
     print_string listing 
-(*   else *)
-(* ignore (Interpret.run program) *)
+  else
+    ignore (Interpret.run program)
       
