@@ -404,10 +404,21 @@ let firstentity =
     hd :: _ -> hd
   | []      -> raise (Failure ("You must declare at least one CardEntity.")))
 in
+let deckstrings = ["C2";"C3";"C4";"C5";"C6";"C7";"C8";"C9";"C10";"CJ";"CQ";"CK";"CA";
+                   "D2";"D3";"D4";"D5";"D6";"D7";"D8";"D9";"D10";"DJ";"DQ";"DK";"DA";
+                   "H2";"H3";"H4";"H5";"H6";"H7";"H8";"H9";"H10";"HJ";"HQ";"HK";"HA";
+                   "S2";"S3";"S4";"S5";"S6";"S7";"S8";"S9";"S10";"SJ";"SQ";"SK";"SA"]
+in
 let cards = List.fold_left
   (fun cards vdecl -> NameMap.add vdecl (StringLiteral(firstentity)) cards)
-  NameMap.empty ["H2";"H3";"H4"]
+  NameMap.empty deckstrings
 in
+(* Add the cards to the first CardEntity too. they map to each other. *)
+let deckcards =
+  ListLiteral(List.fold_left
+    (fun acc cardstring -> CardLiteral(cardstring) :: acc) [] (List.rev deckstrings))
+in
+let entities = NameMap.add firstentity deckcards entities in
 try
   (* XXX should actuals be command line args instead of [] ? *)
   let startDecl = { fname = "Start";
