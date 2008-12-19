@@ -10,6 +10,8 @@ CardEntities
 	deck;
 	player1;
 	player2;
+	player3;
+	player4;
 }
 
 Globals
@@ -21,16 +23,16 @@ Start
 	var i;
 	var r;
 
+	// use a list for convenience
+	var playerlist;
+	playerlist = [$player1, $player2, $player3, $player4];
+
 	i = 0;
 
 	while (i < 52) {
-		r = ~2;
+		r = ~4;
 		<< r;
-		if (r == 0) {
-			$player1 <- $deck[0];
-		} else {
-			$player2 <- $deck[0];
-		}
+		playerlist[r] <- $deck[0];
 		i++;
 	}
 
@@ -51,6 +53,22 @@ Start
 
 		i++;
         }
+
+	i = 0;
+	<< "player 3:";
+	while (i < |$player3|) {
+		<< $player3[i];
+
+		i++;
+        }
+
+	i = 0;
+	<< "player 4:";
+	while (i < |$player4|) {
+		<< $player4[i];
+
+		i++;
+        }
 }
 
 Play 
@@ -59,13 +77,18 @@ Play
 
 WinCondition 
 {
-	if (|$player1| > |$player2|) {
+	if (|$player1| > |$player2| && |$player1| > |$player3| && |$player1| > |$player4|) {
 		return [$player1];
 	} else {
-		if (|$player2| > |$player1|) {
-			return [$player2];
-		} else {
-			return [];
-		}
-	}
+	if (|$player2| > |$player1| && |$player2| > |$player3| && |$player2| > |$player4|) {
+		return [$player2];
+	} else {
+	if (|$player3| > |$player1| && |$player3| > |$player2| && |$player3| > |$player4|) {
+		return [$player3];
+	} else {
+	if (|$player4| > |$player1| && |$player4| > |$player2| && |$player4| > |$player3|) {
+		return [$player4];
+	} else {
+		return [];
+	}}}}
 }
