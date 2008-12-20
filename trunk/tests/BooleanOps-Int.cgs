@@ -1,0 +1,57 @@
+// Testing integer Boolean operators.
+
+Include
+{
+}
+
+CardEntities 
+{
+	deck;
+}
+
+Globals
+{
+}
+
+Start
+{
+	<<1>1;
+	<<1<1;
+	<<1==1;
+	<<1<=1;
+	<<1>=1;
+	<<1!=1;
+	
+	
+	<<1>2;
+	<<1<2;
+	<<1==2;
+	<<1<=2;
+	<<1>=2;
+	<<1!=2;
+	
+	
+	<<2>1;
+	<<2<1;
+	<<2==1;
+	<<2<=1;
+	<<2>=1;
+	<<2!=1;
+	
+	<<1==Null;
+	<<Null==1;
+	
+	<<1 != Null;
+	<<Null != 1;
+	
+	
+}
+
+Play 
+{
+}
+
+WinCondition 
+{
+	return [];
+}

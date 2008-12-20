@@ -1,0 +1,46 @@
+// Testing string Boolean operators.
+
+Include
+{
+}
+
+CardEntities 
+{
+	deck;
+}
+
+Globals
+{
+}
+
+Start
+{
+	<<""=="";
+	
+	<<""=="adsadsa";
+	<<"asdsa"=="";
+	
+	<<"adsad" == Null;
+	<<Null == "adsa";
+	
+	
+	<<""!="";
+	
+	<<""!="adsadsa";
+	<<"asdsa"!="";
+	
+	<<"adsad" != Null;
+	<<Null != "adsa";
+	
+	
+	
+}
+
+Play 
+{
+}
+
+WinCondition 
+{
+	return [];
+}

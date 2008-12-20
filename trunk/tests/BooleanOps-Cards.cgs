@@ -1,0 +1,47 @@
+// Testing string Boolean operators.
+
+Include
+{
+}
+
+CardEntities 
+{
+	deck;
+}
+
+Globals
+{
+}
+
+Start
+{
+	var a; 
+	var b; 
+	
+	a = $deck[0];
+	b = $deck[1];
+	
+	<<a == H2;
+	<<a != H2;
+	<<a == H3;
+	<<a != H3;
+	
+	<<a == b;
+	<<a != b;
+	
+	<<a == a;
+	<<a != a;
+	
+	<<a == Null;
+	<<Null == a;
+	
+}
+
+Play 
+{
+}
+
+WinCondition 
+{
+	return ;
+}
