@@ -1,0 +1,17 @@
+Andrew Shu
+ans2120
+
+Lessons learned
+
+1. How to use OCAML. It's fun learning new languages.
+
+2. Try to anticipate changes that you'll make further down and don't code things too deeply before having to delete large pieces of code. Better yet, just start coding early on so that you can encounter as many problems as you can early on.
+
+3. Getting the ball rolling is hard with long deadlines. It's good to set milestones.
+
+4. It's good to try to get any piece of code down even if it's bad. That way it's easier for your brain to think up alternatives. Also write placeholders so you see the holes in the program.
+
+
+
+
+

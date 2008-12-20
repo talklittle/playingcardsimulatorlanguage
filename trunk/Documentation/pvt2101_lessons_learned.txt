@@ -1,0 +1,13 @@
+Peter Tsonev
+pvt2101
+
+Lessons learned
+
+
+- The hardest part is finalizing the set of language features that you want in a program.
+
+- When working in a group designing something complex like a language, a huge bulk of the time will be spent discussing and changing things that you had decided on earlier.
+
+- It is important to try to implement the fundamental features of the language early on so you know what to keep and what to tweak.
+
+- Expect to have to deal with many unexpected situations that come up only when doing the development and implementation phase.
