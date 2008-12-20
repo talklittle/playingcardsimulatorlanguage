@@ -1,5 +1,3 @@
-// A program that implements a very simple simulation of Poker for 4 players.
-
 Include
 {
 	"stdlib/stdlib.cgl";
