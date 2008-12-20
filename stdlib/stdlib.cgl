@@ -266,7 +266,7 @@ cardface(var c) {
   }
 
   if (c == HA || c == DA || c == CA || c == SA) {
-    return 1;
+    return 14;
   }
 }
 
@@ -370,7 +370,7 @@ shuffle(var e) {
     }
     r = ~i;
     e <- l[r];
-    listremove(l, r);
+    l = listremove(l, r);
     i--;
     j++;
   }

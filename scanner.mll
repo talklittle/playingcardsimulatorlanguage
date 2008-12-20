@@ -40,10 +40,7 @@ rule token = parse
 | '$'      { ENTITYVAR }
 | "<<"     { PRINT }
 | ">>"     { READ }
-| "bool"             { BOOL }
 | "break"            { BREAK }
-| "Card"             { CARD }
-| "CardEntity"       { CARDENTITY }
 | "CardEntities"     { CARDENTITIES }
 | "continue"         { CONTINUE }
 | "else"             { ELSE }
@@ -52,13 +49,10 @@ rule token = parse
 | "Globals"          { GLOBALS }
 | "if"               { IF }
 | "Include"          { INCLUDE }
-| "int"              { INT }
-| "list"             { LIST }
 | "null"             { NULL }
 | "Play"             { PLAY }
 | "return"           { RETURN }
 | "Start"            { START }
-| "string"           { STRING }
 | "true"             { TRUE(true) }
 | "while"            { WHILE }
 | "WinCondition"     { WINCONDITION }
