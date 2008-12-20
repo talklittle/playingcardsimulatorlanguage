@@ -1,4 +1,5 @@
-// A program that implements a very simple simulation of Poker for 4 players.
+// A program that implements a simple simulation of Poker for 4 players.
+// Only recognizes single pairs, three-of-a-kinds, and four-of-a-kinds.
 
 Include
 {
@@ -24,13 +25,13 @@ Start // Deal cards, set chips
 	var i;
 	var e;
 
-	<<"Hello and Welcome to PCGSL Poker!";
+	<< "Hello and Welcome to PCGSL Poker!";
 	
 	#players = [$player0, $player1, $player2, $player3];
 
-	<<"Shuffling deck";
+	<< "Shuffling deck.";
 	shuffle($dealer);
-	<<"Dealing Cards";
+	<< "Dealing Cards.";
 	i = 0;
 	while (i < |#players|) {
 	      e = #players[i];	      
@@ -43,7 +44,7 @@ Start // Deal cards, set chips
 	      e <- $dealer[0];
 
 	      // Print out the player's hand.
-	      << "Player " ^ i ^ " hand: " ^ e[0] ^ " " ^ e[1] ^ " " ^ e[2] 
+	      << "Player " ^ i ^ "'s hand: " ^ e[0] ^ " " ^ e[1] ^ " " ^ e[2] 
 	      	 ^ " " ^ e[3] ^ " " ^ e[4];
 
 	      i++;
@@ -56,98 +57,135 @@ Play
 
 WinCondition 
 {
+	var i;
 	var comp;
-	var highplayer;
-	var highcard;
-	var card1;
-	var card2;
-	var card3;
-	var card4;
+	var highplayers;
+	var highhand;
+	var best0;
+	var best1;
+	var best2;
+	var best3;
 	
-	card1 = high_card($player0);
-	<< "Player 0 high card : " ^ card1;
-	card2 = high_card($player1);
-	<< "Player 1 high card : " ^ card2;
-	card3 = high_card($player2);
-	<< "Player 2 high card : " ^ card3;
-	card4 = high_card($player3);
-	<< "Player 3 high card : " ^ card4;
+	best0 = best_hand($player0);
+	<< "Player 0 best hand : " ^ best0[0] ^ " of face " ^ best0[1];
+	best1 = best_hand($player1);
+	<< "Player 1 best hand : " ^ best1[0] ^ " of face " ^ best1[1];
+	best2 = best_hand($player2);
+	<< "Player 2 best hand : " ^ best2[0] ^ " of face " ^ best2[1];
+	best3 = best_hand($player3);
+	<< "Player 3 best hand : " ^ best3[0] ^ " of face " ^ best3[1];
 
-	comp = card_compare(card1, card2);
+	comp = hand_compare(best0, best1);
 	if (comp > 0) {
-	   highplayer = $player0;
-	   highcard = card1;
+	   highplayers = [$player0];
+	   highhand = best0;
 	} else {
-	   highplayer = $player1;
-	   highcard = card2;
-	}
-	comp = card_compare(highcard, card3);
-	if (comp < 0) {
-	   highplayer = $player2;
-	   highcard = card3;
-	}
-	comp = card_compare(highcard, card4);
-	if (comp < 0) {
-	   highplayer = $player3;
-	   highcard = card4;
+	   if (comp < 0) {
+	      highplayers = [$player1];
+	      highhand = best1;
+	   } else {
+	      highplayers = [$player1, $player2];
+	      highhand = best0;
+	   }
 	}
 
-	<< "The winner is: " ^ highplayer;
-	return [highplayer];
+	comp = hand_compare(highhand, best2);
+	if (comp < 0) {
+	   highplayers = [$player2];
+	   highhand = best2;
+	} else {
+	   if (comp == 0) {
+	      highplayers = highplayers :: $player2;
+	   }
+	}
+
+	comp = hand_compare(highhand, best3);
+	if (comp < 0) {
+	   highplayers = [$player3];
+	   highhand = best3;
+	} else {
+	   if (comp == 0) {
+	      highplayers = highplayers :: $player3;
+	   }
+	}
+
+	<< "The winners are:";
+	i = 0;
+	while (i < |highplayers|) {
+	      << highplayers[i];
+	      i++;
+	}
+
+	return highplayers;
 }
 
-// Simply returns the highest value card (by value, and ties broken by suit)
-// of a player. Assumes exactly 5 cards in the player's card pile.
-high_card(var e) 
-{
-	var comp;
-        var card;
 
-	comp = card_compare(e[0], e[1]);
-	if (comp > 0) {
-	   card = e[0];
-	} else {
-	   card = e[1];
+// Returns [type, val] where type is an int for the type of hand (4 = four
+// of a kind, 3 = 3 of a kind, 2 = best pair, 1 = high card), and val is the 
+// value of that type of hand (14 = Aces, 13 = Kings, ..., 2 = 2's). Assumes
+// a 5-card CardEntity is given.
+best_hand(var e) {
+	var list;
+	var i;
+	var highpairval;
+	var highsingval;
+
+	list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+	list[cardface(e[0])] += 1;
+	list[cardface(e[1])] += 1;
+	list[cardface(e[2])] += 1;
+	list[cardface(e[3])] += 1;
+	list[cardface(e[4])] += 1;
+
+	i = 2;
+	while (i <= 14) {
+	   if (list[i] == 4) {
+	      return [4, i];
+	   }
+
+	   if (list[i] == 3) {
+	      return [3, i];
+	   }
+
+	   if (list[i] == 2) {
+	      highpairval = i;
+	   }
+
+	   if (list[i] == 1) {
+	      highsingval = i;
+	   }
+
+	   i++;
 	}
-	comp = card_compare(card, e[2]);
-	if (comp < 0) {
-	   card = e[2];
+
+	if (highpairval != null) {
+	   return [2, highpairval];
 	}
-	comp = card_compare(card, e[3]);
-	if (comp < 0) {
-	   card = e[3];
-	}
-	comp = card_compare(card, e[4]);
-	if (comp < 0) {
-	   card = e[4];
-	}
-	
-	return card;
+
+	return [1, highsingval];
 }
 
-// Returns 1 if c1 is higher, -1 if c1 is lower, 0 if equal.
-card_compare(var c1, var c2) {
-  var s1;
-  var s2;
-  var f1;
-  var f2;
+// Takes two hands of the form [type, val] as described in the high_hand
+// function. Returns 1 if the first hand is better, -1 if the second hand is
+// better, and 0 if they are equal.
+hand_compare(var h1, var h2) {
 
-  s1 = cardsuit(c1);
-  s2 = cardsuit(c2);
-  f1 = cardface(c1);
-  f2 = cardface(c2);
+	if (h1[0] > h2[0]) {
+	   return 1;
+	}
 
-  if (f1 > f2) {
-    return 1;
-  }
-  if (f1 < f2) {
-    return 0 - 1;
-  }
-  if (s1 > s2) {
-    return 1;
-  }
-  if (s1 < s2) {
-    return 0 - 1;
-  }
-  return 0;
+	if (h2[0] > h1[0]) {
+	   return 0 - 1;
+	}
+
+	if (h1[1] > h2[1]) {
+	   return 1;
+	}
+
+	if (h2[1] > h1[1]) {
+	   return 0 - 1;
+	}
+
+	return 0;
 }
