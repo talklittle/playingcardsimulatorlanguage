@@ -1,0 +1,39 @@
+// Testing random numbers
+
+Include
+{
+}
+
+CardEntities 
+{
+	deck;
+}
+
+Globals
+{
+}
+
+Start
+{
+	var array;
+	
+	array = ["a", "b", "c"];
+
+	<<@"string";
+	<<@1;
+	<<@false;
+	<<@H2;
+	<<@$deck;
+	<<@array;
+	<<@array[0];
+	
+}
+
+Play 
+{
+}
+
+WinCondition 
+{
+	return ;
+}

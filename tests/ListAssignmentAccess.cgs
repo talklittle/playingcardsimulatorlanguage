@@ -1,0 +1,51 @@
+// Testing random numbers
+
+Include
+{
+}
+
+CardEntities 
+{
+	deck;
+	player1;
+	player2;
+	player3;
+}
+
+Globals
+{
+}
+
+Start
+{
+	var stringList;
+	var intList;
+	var cardList;
+	var cardEntityList;
+	var boolList;
+
+	stringList = ["a", "b", "c"];
+	intList = [1,2,3];
+	cardList = [H2, H3, H4];
+	cardEntityList = [$deck, $player1, $player2, $player3];
+	boolList = [false, true, false];
+	
+	<<stringList[0]^stringList[1]^stringList[2];
+	
+	<<""^intList[0]^intList[1]^intList[2];
+	
+	<<""^cardList[0]^cardList[1]^cardList[2];
+	
+	<<""^cardEntityList[0]^cardEntityList[1]^cardEntityList[2];
+	
+	<<""^boolList[0]^boolList[1]^boolList[2];
+}
+
+Play 
+{
+}
+
+WinCondition 
+{
+	return ;
+}
