@@ -134,6 +134,73 @@ Declared variables consist of the keyword \textit{var} followed by an identifier
 \begin{enumerate}\item \textit{Include \{file-list\} ;} \ \ \ \ Block containing a comma delimited list of files to import (e.g. "stdlib/stdlib.cgl")\item \textit{CardEntities \{entity-list\} ;} \ \ \ \ Block containing a comma delimited list of card entities (e.g. player1)
 \item \textit{Globals \{declaration-list\} ;} \ \ \ \ Block containing variable declarations. These variables, and only these variables, have global scope. \item \textit{Start \{statement-list\} ;} \ \ \ \ Block containing the code executed at initialization of the program. \item \textit{Play \{statement-list\};} \ \ \ \ Block that is called after the Start block. This block is executed repeatedly until the WinCondition block returns a non-Null value.\item \textit{WinCondition \{statement-list\} ;} \ \ \ \ Block that is called automatically after every play() function. The game stops when this returns a non-Null value.
 \end{enumerate}
-  All code in PCGSL must be contained in one of the above blocks or inside function bodies. \end{document}
+  All code in PCGSL must be contained in one of the above blocks or inside function bodies. 
+
+\section{Expressions and Operators}
+
+\subsection{Precedence and Association Rules in PCGSL}
+
+Precedence of operators is list in order from lowest to highest:
+
+\begin{itemize}
+\item IDs and literals \ \ \ \ Primary; L-R; Token.
+\item $\hat{}$  \ \ \ \ Binary; L-R; String concatenation.
+\item $|$$|$ \ \ \ \ Binary; L-R; Logical OR.
+\item \&\& \ \ \ \ Binary; L-R; Logical AND.
+\item $=$ \ \ \ \ Binary; R-L; Assignment.
+\item $+$$=$ \ \ \ \ Binary; R-L; Assignment with addition.
+\item $-$$=$ \ \ \ \ Binary; R-L; Assignment with subtraction.
+\item $*$$=$ \ \ \ \ Binary; R-L; Assignment with multiplication.
+\item $/$$=$ \ \ \ \ Binary; R-L; Assignment with division.
+\item ::  \ \ \ \ Binary; R-L; Appending to a list.
+\item $>$$>$  \ \ \ \ Unary; R-L; Reading in from standard input.\item $<$$<$  \ \ \ \ Unary; R-L; Printing to standard output.
+\item $<$$-$ \ \ \ \ Binary; L-R; Card transfer.
+\item $=$$=$  \ \ \ \ Binary; L-R; Equality test.
+\item !$=$ \ \ \ \ Binary; L-R; Inequality test.
+\item $<$ \ \ \ \ Binary; L-R; Less-than test.
+\item $<$$=$ \ \ \ \ Binary; L-R; Less-than-or-equal-to test.
+\item $>$ \ \ \ \ Binary; L-R; Greater-than test.
+\item $>$$=$ \ \ \ \ Binary; L-R; Greater-than-or-equal-to test.
+\item $+$ \ \ \ \ Binary; L-R; Addition.
+\item $-$ \ \ \ \ Binary; L-R; Subtraction.
+\item $*$ \ \ \ \ Binary; L-R; Multiplication.
+\item $/$ \ \ \ \ Binary; L-R; Division.\item $+$$+$ \ \ \ \ Unary; L-R; Assignment with increment.
+\item $--$ \ \ \ \ Unary; L-R; Assignment with decrement.
+\item \~{}  \ \ \ \ Unary; L-R; Random integer generation.
+\item $@$  \ \ \ \ Unary; L-R; Type checker.
+\item \#  \ \ \ \ Unary; L-R; Global variable indicator.
+\item \textdollar  \ \ \ \ Unary; L-R; CardEntity indicator.
+\end{itemize}
+\subsection{Expressions}
+
+Primary expressions may consist of identifiers, integer/boolean/card constants, string literals (e.g. "hello"), and list literals (e.g. [1, 2, 3]). Expressions may also be derived from operations, using the operators listed above, on one or two sub-expressions. Finally, expressions may also be derived from function calls.
+\subsection{Function Calls}
+Function call syntax is as follows:
+
+\begin{itemize}
+\item \textit{postfix-expression (argument-expression-list)}
+\end{itemize}
+
+An \textit{argument-expression-list} is a comma-separated list of expressions passed to the function (which undergoes applicative order evaluation). The function may return any value, which can then be evaluated as an expression.
+\subsection{Assignment}
+Assignment is handled in a standard fashion. The left-hand argument to assignment operators must be variable locations to which the evaluated right-hand argument of the operator is assigned.
+
+\section{Statements}A statement is a complete instruction to the computer. Except as indicated, statements are executed in sequence. A statement can be an \textit{expression-statement}, a  \textit{selection-statement}, an \textit{iteration-statement}, or a \textit{jump-statement}.
+\subsection{Expression Statements}Expression statements consist of an expression terminated by a semicolon: The expression may have side effects or return a value. If it returns the value, it is discarded. \subsection{Selection Statements}Selection statements define branching in PCGSL. These statements select a set of statements to execute based on the evaluation of an expression. The only selection statement PCGSL supports is the if/else statement: 
+
+\begin{itemize}
+\item \textit{if(expression) \{statement-list\}}
+\item \textit{if (expression) \{statement-list\} else \{statement-list\}}
+\end{itemize}
+
+The controlling expression must have a boolean type. Returning the wrong type will cause a runtime error.\subsection{Iteration Statements}
+An iteration statement repeatedly executes a list of statements, so long as its controlling expression returns true after each pass. The only iteration statement PCGSL supports is the while statement:
+
+\begin{itemize}
+\item \textit{while(expression) \{statement-list\}}
+\end{itemize}
+
+The controller expression must be boolean type. For the while loop, the controller is executed before each execution of the body's statement-list.\subsection{Jump Statements}Jump statements cause unconditional transfer of control. We currently support both break and return statements, which appear followed by a semicolon. Break only has meaning inside iteration statements, break passing control to the statement immediately following the iteration statement. Return ends the currently executing function and returns the value of the expression. Since PCGSL functions have no return type, no type checking is necessary. 
+\end{document}
 
 
