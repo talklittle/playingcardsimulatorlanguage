@@ -1,0 +1,139 @@
+
+\documentclass[12pt]{report}
+
+\setlength{\oddsidemargin}{0.0in}
+\setlength{\textwidth}{6.5in}
+%\setlength{\topmargin}{0in}
+%\setlength{\textheight}{7.5in}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage{epsfig}
+
+\linespread{1.1}
+
+\newenvironment{proof}{\noindent \textbf{Proof:}}{$\Box$}
+\newenvironment{claim}{\noindent \textbf{Claim:}}{}
+\newenvironment{theorem}{\noindent \textbf{Theorem:}}{}
+\newcommand{\infint}{\int_{-\infty}^\infty}
+\newcommand{\intunit}{\int_{-1}^1}
+
+\title{PCGSL: Playing Card Game Simulation Language}
+
+\date{
+\ \\
+COMS W4115
+\\
+Programming Languages and Translators
+\\
+\today
+}
+
+\author{
+Enrique Henestroza
+\\
+{\tt eh2348@columbia.edu}
+\and
+Yuriy Kagan
+\\
+{\tt yk2159@columbia.edu}
+\and
+Andrew Shu
+\\
+{\tt ans2120@columbia.edu}
+\and
+Peter Tsonev
+\\
+{\tt pvt2101@columbia.edu}
+}
+
+\begin{document}
+
+\begin{titlepage}
+
+\maketitle
+
+\end{titlepage}
+
+\setcounter{tocdepth}{2}
+
+\tableofcontents
+
+\pagebreak
+
+\chapter{Introduction}
+
+The Playing Card Game Simulation Language (PCGSL) is designed to be a simple programming language for programming card games. Our language allows a programmer to work within a standard set of conventions and procedures for playing card games, without having to write a large amount of code as one would have to in a general-purpose language. This allows the programmer to focus on creating randomized simulations of popular games or hands, as well as quick mock-ups of new games based around standard 52-card decks.
+
+\section{Simple}
+
+PCGSL is simple to learn. Using well known C-style imperative syntax conventions, our language...
+
+\chapter{Language Tutorial}
+
+\chapter{Language Manual}
+
+\section{Lexical Conventions}This section covers the lexical conventions including comments and tokens. A token is a series of contiguous characters that the compiler treats as a unit. Blanks, tabs, newlines, and comments are collectively known as Òwhite space.Ó White space is ignored except as it serves to separate tokens. Some white space is required to separate otherwise adjacent identifiers, keywords, and constants. If the input stream has been parsed into tokens up to a given character, the next token is taken to include the longest string of characters that could possibly constitute a token.\subsection{Comments}The // characters introduce a comment; a newline terminates a comment. The // characters do not indicate a comment when occurring within a string literal. Comments do not nest. Once the // introducing a comment are seen, all other characters are ignored until the ending newline is encountered.\subsection{Identifiers}An identifier is a sequence of letters, digits, and underscores (\_). The first character cannot be a digit. Uppercase and lowercase letters are distinct. Identifier length is unlimited.\subsection{Keywords}The identifiers listed below are reserved for use as keywords and cannot be used for any other purpose. Among these are a group of reserved identifiers corresponds to card names for a standard 52-card deck.
+
+\ \\
+
+\noindent break  Play  CardEntities return  else Start false true Globals while If WinCondition Include var null H2	H3	H4	H5	H6	H7	H8	H9	H10	HJ	HQ	HK	HAD2	D3	D4	D5	D6	D7	D8	D9	D10	DJ	DQ	DK	DAC2	C3	C4	C5	C6	C7	C8	C9	C10	CJ	CQ	CK	CAS2	S3	S4	S5	S6	S7	S8	S9	S10	SJ	SQ	SK	SA
+	\subsection{Constants}The two types of constants are integer and character string. \subsubsection{Integer Constants}An integer constant consists of a sequence of one or more digits, and is always considered decimal.\subsubsection{String Constants}A string constant is a sequence of characters surrounded by double quotation marks, such as ÒHello World!Ó. We consider characters to be ASCII printable characters.\subsection{Operators}An operator specifies an operation to be performed. The operators are shown below: \\\noindent $<$$-$ \ \ \ \ \
+$+$$+$ \ \ \ \ \
+$+$ \ \ \ \ \
+$--$ \ \ \ \ \
+$-$ \ \ \ \ \
+$*$ \ \ \ \ \
+$/$ \ \ \ \ \$+$$=$ \ \ \ \ \
+$-$$=$ \ \ \ \ \
+$*$$=$ \ \ \ \ \
+$/$$=$ \ \ \ \ \
+$=$$=$  \ \ \ \ \
+$=$ \ \ \ \ \
+!$=$ \ \ \ \ \
+$<$ \ \ \ \ \
+$<$$=$ \ \ \ \ \	
+$>$ \ \ \ \ \
+$>$$=$ \ \ \ \ \	
+\&\& \ \ \ \ \
+$|$$|$ \ \ \ \ \
+::  \ \ \ \ \
+$|$  \ \ \ \ \
+\~{}  \ \ \ \ \
+$\hat{}$  \ \ \ \ \
+$@$  \ \ \ \ \
+\#  \ \ \ \ \
+\textdollar  \ \ \ \ \
+$>$$>$  \ \ \ \ \$<$$<$
+
+\subsection{Meaning of Identifiers}Identifiers are disambiguated by their type, scope, and namespace. No identifier will have linkage, and storage duration will be determined by the scope, e.g. identifiers within the same scope will have the same storage duration.\subsubsection{Type}Our language has four fundamental object types Ð int, string, boolean, and Card. In addition, there are two derived types: list and CardEntity. There is no notion of a floating point number since it is not really needed in card games. There is also no need for a char type, since it can be simulated by a string consisting of a single ASCII symbol. 
+
+\begin{itemize}\item int: the int type can represent an arbitrary integer since it will be mapped to the OCaml integer internally. \item bool: the bool type represents a boolean, either of the value 'true' or 'false'. It is mapped to OCaml boolean internally. \item string: the string type will be able to hold arbitrary strings since it will also be mapped to OCaml strings internally. 
+\item Card: the Card type is a basic type that represents one of the 52 cards in a standard playing card deck.\item list: the list type is a derived type since it is a collection of fundamental objects. They have an attribute called length that stores the length of the list. \item CardEntity: The CardEntity type represents a certain participant in the card game who can be active (e.g. a player) or passive (e.g. a deck or a flop). Each CardEntity has a list of Card objects that belongs to it, and special operators for transferring Card objects among CardEntity objects.
+\end{itemize}
+  \subsection{Scope, Namespace, and Storage Duration}Unlike C identifiers, PCGSL identifiers have no linkage, e.g. the scopes are disjoint.   \subsubsection{Scope}The scope specifies the region where certain identifiers are visible. PCGSL employs static scope. There are two kinds of scope, and they do not intersect: 
+
+\begin{itemize} 
+\item Global scope Ð variables defined within the Globals block have global scope. Global variables cannot be defined in functions or any other block. Global variables are accessed via the '\#' symbol. Therefore there are no intersections with the local scope.  \item Function/Block scope Ð variables declared within a function or block will be visible within that function or block. Nested functions or blocks are disallowed in the language.
+\end{itemize}
+  \subsubsection{Namespace}Functions and blocks share a namespace. Variables have their own namespace, as do CardEntities. None of these three namespaces overlap.  \subsubsection{Storage Duration}Local variables have automatic storage duration. Their lifetime expires after the function in which they are defined returns. Global variables have static storage duration and live from their declaration to the end of program execution. 
+  \section{Declarations}
+
+A declaration specifies the interpretation given to a set of identifiers. Declarations in PCGSL define variables (including lists), CardEntity objects, and functions. Variable declarations are untyped. Declarations have the following form: 
+
+\begin{enumerate}
+
+\item Variable Declaration: \textit{var identifier;}\item Function Declaration: \textit{identifier (parameter-list) \{body\};} 
+
+\end{enumerate}
+
+\subsection{Variables}
+Declared variables consist of the keyword \textit{var} followed by an identifier. They are uninitialized, and are given a Null value when declared. Null is a special data type that can be compared to any other data type. \subsection{Functions}Functions in PCGSL have no return type (returning the wrong type generates a runtime error). Functions may only be declared in the global scope. The \textit{parameter-type-list} is the list of parameter identifiers, separated by commas with each preceded by the keyword \textit{var}. The \textit{body} is optional, and contains variable declarations as well as statements to be executed.\subsection{Special Blocks}There are several special required blocks that are declared in global scope. All blocks must exist in every PCGSL program, and appear at the beginning of the source file in the order below (followed by function declarations):
+
+\begin{enumerate}\item \textit{Include \{file-list\} ;} \ \ \ \ Block containing a comma delimited list of files to import (e.g. "stdlib/stdlib.cgl")\item \textit{CardEntities \{entity-list\} ;} \ \ \ \ Block containing a comma delimited list of card entities (e.g. player1)
+\item \textit{Globals \{declaration-list\} ;} \ \ \ \ Block containing variable declarations. These variables, and only these variables, have global scope. \item \textit{Start \{statement-list\} ;} \ \ \ \ Block containing the code executed at initialization of the program. \item \textit{Play \{statement-list\};} \ \ \ \ Block that is called after the Start block. This block is executed repeatedly until the WinCondition block returns a non-Null value.\item \textit{WinCondition \{statement-list\} ;} \ \ \ \ Block that is called automatically after every play() function. The game stops when this returns a non-Null value.
+\end{enumerate}
+  All code in PCGSL must be contained in one of the above blocks or inside function bodies. \end{document}
+
+
