@@ -15,14 +15,10 @@ Globals
 
 Start
 {
-	var list;
+	var str;
 	
-	list = [1,2,3];
-	
-	<<""^list[0]^list[1]^list[2];
-	list = list::4;
-	
-	<<""^list[0]^list[1]^list[2]^list[3];
+	>>str;
+	<<str;
 }
 
 Play 

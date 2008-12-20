@@ -1,0 +1,30 @@
+// Testing listLength
+
+Include
+{
+}
+
+CardEntities 
+{
+	deck;
+}
+
+Globals
+{
+}
+
+Start
+{
+	<<"Start Executing";
+}
+
+Play 
+{
+	<<"Play Executing";
+}
+
+WinCondition 
+{
+	<<"WinCondition Executing";
+	return false;
+}
