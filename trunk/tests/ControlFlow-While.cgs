@@ -15,14 +15,14 @@ Globals
 
 Start
 {
-	var list;
+	var i;
 	
-	list = [1,2,3];
-	
-	<<""^list[0]^list[1]^list[2];
-	list = list::4;
-	
-	<<""^list[0]^list[1]^list[2]^list[3];
+	i=0;
+	while(i<5)
+	{
+		<<i;
+		i=i+1;
+	}
 }
 
 Play 

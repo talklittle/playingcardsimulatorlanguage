@@ -1,0 +1,57 @@
+// Testing random numbers
+
+Include
+{
+}
+
+CardEntities 
+{
+	deck;
+}
+
+Globals
+{
+	var int;
+	var string;
+	var card;
+	var cardEntity;
+	var list;
+}
+
+Start
+{
+	
+	
+	#int = 1;
+	#string = "string";
+	#card = H2;
+	#cardEntity = $deck;
+	#list = ["a", "b"];
+	
+	<<#int;
+	<<#string;
+	<<#card;
+	<<#cardEntity;
+	<<#list[0];
+	
+	test();
+}
+
+Play 
+{
+}
+
+WinCondition 
+{
+	return ;
+}
+
+test()
+{
+	<<#int;
+	<<#string;
+	<<#card;
+	<<#cardEntity;
+	<<#list[0];
+	
+}
