@@ -1,0 +1,38 @@
+// Testing listLength
+
+Include
+{
+}
+
+CardEntities 
+{
+	deck;
+}
+
+Globals
+{
+}
+
+Start
+{
+	var listLong;
+	var listShort;
+	var listNull;
+	
+	listLong = [1, 2, 3, 4, 5, 6, 7 ,8, 9, 10, 11, 12, 1, 2];
+	listShort = [1,2];
+	listNull = [];
+	
+	<<|listLong|;
+	<<|listShort|;
+	<<|listNull|;
+}
+
+Play 
+{
+}
+
+WinCondition 
+{
+	return ;
+}

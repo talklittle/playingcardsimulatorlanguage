@@ -1,0 +1,37 @@
+// Testing random numbers
+
+Include
+{
+}
+
+CardEntities 
+{
+	deck;
+}
+
+Globals
+{
+}
+
+Start
+{
+	<<~10;
+	<<~10;
+	<<~10;
+	<<~10;
+	<<~10;
+	<<~10;
+	<<~1;
+	<<~0;
+	
+	
+}
+
+Play 
+{
+}
+
+WinCondition 
+{
+	return ;
+}
